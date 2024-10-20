@@ -10,7 +10,7 @@ const playerSchema = new mongoose.Schema<IPlayer>(
     {
         name: {type: String, required: true},
         gameId: {
-            type: mongoose.Schema.Types.ObjectId as any,
+            type: String, //später ObjektID
             required: true,
             ref: "IGame"
         }
