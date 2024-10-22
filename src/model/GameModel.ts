@@ -6,7 +6,7 @@ export interface IGame {
         type: string,  
         coordinates: [number, number],  
     };
-    //players: mongoose.Schema.Types.ObjectId[]; Später bearbeiten für Liste der Spieler im Game
+    playersID?: mongoose.Schema.Types.ObjectId[]; //Später bearbeiten für Liste der Spieler im Game
 }
 
 const gameSchema = new mongoose.Schema<IGame>(
@@ -22,7 +22,9 @@ const gameSchema = new mongoose.Schema<IGame>(
                 type: [Number],  
                 required: true
             }
-        }
+        },
+        playersID: [{ type: String, 
+            ref: 'Player' }]
     }
 );
 

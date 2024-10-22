@@ -11,3 +11,17 @@ export const gameRouter = express.Router();
 gameRouter.get("/:id", async(req, res, next)=>{
     throw new Error("not implemented yet")
 })
+
+/**
+ * Route zum Erstellen eines neuen Games
+ */
+gameRouter.post("/", async (req, res, next) => {
+    throw new Error("not implemented yet");
+});
+
+/**
+ * Route zum Löschen eines Games anhand der ID
+ */
+gameRouter.delete("/:id", async (req, res, next) => {
+    throw new Error("not implemented yet");
+});
