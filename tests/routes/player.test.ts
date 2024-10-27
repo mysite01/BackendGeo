@@ -30,3 +30,16 @@ test("Test create Player, falsche eingaben (falscher datentyp, gameid)", async()
     const response = await testee.post(`/api/player/`).send({name: "Arwed", gameId: 1})
     expect(response.status).toBe(404)
 })
+
+test("Test delete Player", async()=>{
+    const testee = supertest(app)
+    const player = await PlayerService.createPlayer({name: "Thomas", gameId: "1"})
+    const response = await testee.delete(`/api/player/${player.id}`)
+    expect(response.status).toBe(204)
+})
+
+test("Test delete Player, falsche Id", async ()=> {
+    const testee = supertest(app)
+    const response = await testee.delete(`/api/player/1`)
+    expect(response.status).toBe(404)
+})
