@@ -8,9 +8,9 @@ export type PlayerResource = {
 export type GameResource = {
     id?: string;  
     title: string;  
-    location: {
-        type: "Point";  
-        coordinates: [number, number]; 
-    };
-    players?: string[];
+    POIs: {
+        type: "Point";
+        coordinates: [number, number];
+    }[];
+    playersID: string[];
 }
