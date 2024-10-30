@@ -1,5 +1,6 @@
-import { PlayerResource } from "src/Resources"
-import { Player } from "src/model/PlayerModel";
+import { PlayerResource } from "../../src/Resources";
+import { Player } from "../model/PlayerModel";
+
 
 /**
  * gibt alle Spieler aus einem bestimmten Game als
@@ -19,7 +20,7 @@ export async function getAllPlayers(gameId: string): Promise<PlayerResource[]> {
 }
 
 
-    throw new Error("not implemented yet")
+   // throw new Error("not implemented yet")
 
 
 /**
@@ -28,8 +29,24 @@ export async function getAllPlayers(gameId: string): Promise<PlayerResource[]> {
  * geworfen
  */
 export async function getPlayer(id:string): Promise<PlayerResource> {
-    throw new Error("not implemented yet")
+    const player = await Player.findById(id).exec();
+
+    if (!player) {
+        throw new Error(`Player mit ID ${id} nicht gefunden`);
+    }
+
+    const playerResource: PlayerResource = {
+        id: player._id.toString(),
+        name: player.name,
+        gameId: player.gameId.toString(),
+        createdAt: player.createdAt ? player.createdAt.toISOString() : new Date().toISOString(),
+    };
+
+    return playerResource;
 }
+
+   // throw new Error("not implemented yet")
+
 
 /**
  * Erzeugt einen Player
