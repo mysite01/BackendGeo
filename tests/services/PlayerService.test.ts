@@ -27,7 +27,7 @@ test("getPlayer - Spieler mit bestimmter ID abrufen", async () => {
 
 test("getPlayer - Fehler bei nicht existierendem Spieler", async () => {
     const nonExistentId = "000000000000000000000000"; // Eine ungültige ID
-    await expect(getPlayer(nonExistentId)).rejects.toThrow(`Player mit der ID ${nonExistentId} wurde nicht gefunden`);
+    await expect(getPlayer(nonExistentId)).rejects.toThrow(`Player mit ID ${nonExistentId} nicht gefunden`);
 });
 
 test("createPlayer - Spieler erstellen", async () => {
