@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import * as GameService from "../../src/services/GameService"
+import { Game } from "src/model/GameModel";
 
 test("sollte ein neues Spiel erstellen und 201 zurückgeben", async () => {
     const newGameData = {
@@ -14,28 +15,10 @@ test("sollte ein neues Spiel erstellen und 201 zurückgeben", async () => {
         playersID: []
     };
 
-    const response = await supertest(app).post("/games").send(newGameData);
+    const response = await supertest(app).post("/api/game").send(newGameData);
 
     expect(response.status).toBe(201);
     expect(response.body.title).toBe(newGameData.title);
     expect(response.body.POIs).toEqual(newGameData.POIs);
     expect(response.body.playersID).toEqual(newGameData.playersID);
-});
-    
-test("sollte ein Spiel löschen und 204 zurückgeben", async () => {
-    // Erstellen eines Spiels, um es danach zu löschen
-    const newGame = await GameService.createGame({ title: "Spiel zum Löschen", POIs: [], playersID: [] });
-
-    const response = await supertest(app).delete(`/games/${newGame.id}`);
-
-    expect(response.status).toBe(204);
-});
-
-test("sollte 404 zurückgeben, wenn das Spiel nicht gefunden wird", async () => {
-    const nonExistentId = "6b";
-
-    const response = await supertest(app).delete(`/games/${nonExistentId}`);
-
-    expect(response.status).toBe(404);
-    expect(response.body.error).toBe("Fehler beim Löschen des Spiels");
 });

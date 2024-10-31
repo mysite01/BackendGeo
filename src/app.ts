@@ -7,6 +7,8 @@ import {gameRouter} from './routes/game'
 
 const app = express();
 
+app.use(express.json());
+
 //Routes
 app.use("/api/player", playerRouter)
 app.use("/api/game", gameRouter);
