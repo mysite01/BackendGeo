@@ -14,3 +14,13 @@ export type GameResource = {
     }[];
     playersID: string[];
 }
+
+export interface GameInstanceResource {
+    id?: string;
+    name?: string;
+    status: number; 
+    startTime: string; 
+    endTime: string;
+    gameID: string;
+    teamsID: string[];
+}
