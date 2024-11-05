@@ -14,3 +14,9 @@ export type GameResource = {
     }[];
     playersID: string[];
 }
+export type TeamResource = {
+    id?: string;
+    name: string;
+    playersID: string[]; 
+    createdAt?: string;
+};
