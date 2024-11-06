@@ -1,12 +1,22 @@
 import express from "express";
 import { GameInstanceResource } from "src/Resources";
 import * as GameInstanceService from "../services/GameInstanceService"
+import { createGameInstance } from "../services/GameInstanceService";
 
 
 export const gameInstanceRouter = express.Router();
 
+/**
+ * Route zum Erstellen einer neuen GameInstance.
+ */
 gameInstanceRouter.post("/", async (req, res, next) => {
-    throw new Error("not implemented yet");
+    try {
+        const newGameInstance = await createGameInstance(req.body);
+        res.status(201).send(newGameInstance);
+    } catch (err) {
+        res.status(400); 
+        next(err);
+    }
 });
 
 /**
