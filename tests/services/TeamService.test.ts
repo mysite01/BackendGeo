@@ -43,5 +43,3 @@ test('Get players in team by ID', async () => {
     expect(fetchedPlayers).toHaveLength(2);
     expect(fetchedPlayers).toEqual(expect.arrayContaining(teamData.playersID));
 });
-
-

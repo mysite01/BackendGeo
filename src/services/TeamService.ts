@@ -46,5 +46,3 @@ export async function getPlayerInTeam(teamId: string): Promise<string[]> {
         throw new Error("Fehler beim Abrufen der Spieler im Team");
     }
 }
-
-

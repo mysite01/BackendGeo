@@ -1,19 +1,18 @@
 import { GameResource } from 'src/Resources';
-import { Game, IGame } from '../model/GameModel';
+import { Game } from '../model/GameModel';
 
 /**
  * Erstellt ein neues Game
- * 
  */
 export async function createGame(gameResource: GameResource): Promise<GameResource> {
     try {
         const game = new Game({
             title: gameResource.title,
+            beschreibung: gameResource.beschreibung || "", // Beschreibungsfeld hinzufügen
             POIs: gameResource.POIs.map(poi => ({
                 type: "Point",
                 coordinates: poi.coordinates
-            })),
-            playersID: gameResource.playersID.map(playerId => playerId)
+            }))
         });
 
         const savedGame = await game.save();
@@ -21,11 +20,11 @@ export async function createGame(gameResource: GameResource): Promise<GameResour
         return {
             id: savedGame._id.toString(),
             title: savedGame.title,
+            beschreibung: savedGame.beschreibung || "",
             POIs: savedGame.POIs.map(poi => ({
                 type: "Point",
                 coordinates: poi.coordinates
-            })),
-            playersID: savedGame.playersID.map(playerId => playerId.toString())
+            }))
         };
     } catch (error) {
         throw new Error("Fehler beim Erstellen des Spiels");
@@ -44,11 +43,11 @@ export async function getGameById(id: string): Promise<GameResource> {
         return {
             id: game._id.toString(),
             title: game.title,
+            beschreibung: game.beschreibung || "",
             POIs: game.POIs.map(poi => ({
                 type: "Point",
                 coordinates: poi.coordinates
-            })),
-            playersID: game.playersID.map(playerId => playerId.toString())
+            }))
         };
     } catch (error) {
         throw new Error("Fehler beim Abrufen des Spiels");
@@ -60,7 +59,7 @@ export async function getGameById(id: string): Promise<GameResource> {
  */
 export async function deleteGame(id: string): Promise<void> {
     const query = await Game.findByIdAndDelete(id).exec();
-    if(!query) {
-        throw new Error("Das Spiel mit der konnte nicht gelöscht werden!")
+    if (!query) {
+        throw new Error("Das Spiel konnte nicht gelöscht werden!");
     }
 }

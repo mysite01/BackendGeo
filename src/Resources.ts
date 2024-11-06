@@ -5,14 +5,14 @@ export type PlayerResource = {
     createdAt?: string 
 }
 
-export type GameResource = {
-    id?: string;  
-    title: string;  
+export interface GameResource {
+    id?: string;
+    title: string;
+    beschreibung?: string;
     POIs: {
-        type: "Point";
+        type: string;
         coordinates: [number, number];
     }[];
-    playersID: string[];
 }
 export type TeamResource = {
     id?: string;
