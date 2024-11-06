@@ -1,5 +1,5 @@
 import express from "express";
-import { createGameInstance, getGameInstanceById } from "../services/GameInstanceService";
+import { createGameInstance, deleteGameInstance, getGameInstanceById } from "../services/GameInstanceService";
 
 
 export const gameInstanceRouter = express.Router();
@@ -42,8 +42,16 @@ gameInstanceRouter.patch("/:id/status", async (req, res, next) => {
  * Route zum Löschen einer GameInstance anhand der ID.
  */
 gameInstanceRouter.delete("/:id", async (req, res, next) => {
-    throw new Error("not implemented yet");
+    try {
+        const gameInstanceId = req.params.id;
+        await deleteGameInstance(gameInstanceId);
+        res.status(200).json({ message: "GameInstance wurde erfolgreich gelöscht!" });
+    } catch (error) {
+        res.status(404).json({ error: `GameInstance mit der ID ${req.params.id} konnte nicht gelöscht werden.` });
+        next(error);
+    }
 });
+
 
 /**
  * Route zum Abrufen aller GameInstances eines bestimmten Spiels.
