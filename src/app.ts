@@ -3,6 +3,7 @@ import "express-async-errors";
 
 import {playerRouter} from './routes/player'
 import {gameRouter} from './routes/game'
+import {gameInstanceRouter} from './routes/gameInstance'
 
 import cors from 'cors';
 
@@ -32,6 +33,7 @@ app.get('/', (req: Request, res: Response) => {
 //Routes
 app.use("/api/player", playerRouter)
 app.use("/api/game", gameRouter);
+app.use("/api/gameInstance", gameInstanceRouter);
 
 
 export default app;
