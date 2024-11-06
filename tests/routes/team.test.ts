@@ -28,6 +28,21 @@ test ("Delete Team Test", async()=>{
 
     const testee = supertest(app)
 
-    const response = await testee.delete(`/api/team/${newTeam.id}`).send(newTeamResource)
+    const response = await testee.delete(`/api/team/${newTeam.id}`).send()
     expect(response.statusCode).toBe(204)
+})
+
+test("Get Players in Team test", async()=>{
+    const newPlayer = await PlayerService.createPlayer({name: "Thomas", gameId: "1"})
+    const playerID: string = newPlayer.id!
+    const newTeamResource: TeamResource = {
+        name: "Team 1",
+        playersID: [playerID]
+    }
+    const newTeam = await TeamService.createTeam(newTeamResource)
+
+    const testee = supertest(app)
+
+    const response = await testee.get(`/api/team/${newTeam.id}`).send()
+    expect(response.statusCode).toBe(201)
 })
