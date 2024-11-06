@@ -24,7 +24,7 @@ async function setup() {
     await mongoose.connect(mongodURI);
 
 
-    const httpPort = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3000;
+    const httpPort = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3443;
     const httpServer = http.createServer(app);
 
     function startHttpServer() {
