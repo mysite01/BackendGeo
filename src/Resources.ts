@@ -15,7 +15,7 @@ export type GameResource = {
     playersID: string[];
 }
 
-export interface GameInstanceResource {
+export type GameInstanceResource = {
     id?: string;
     name?: string;
     status: number; 
@@ -24,3 +24,10 @@ export interface GameInstanceResource {
     gameID: string;
     teamsID: string[];
 }
+
+export type TeamResource = {
+    id?: string;
+    name: string;
+    playersID: string[]; 
+    createdAt?: string;
+};
