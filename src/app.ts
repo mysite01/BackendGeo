@@ -24,6 +24,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next();
   });
   
+// Beispielroute
+app.get('/', (req: Request, res: Response) => {
+    res.send('CORS ist konfiguriert!');
+  });  
 
 //Routes
 app.use("/api/player", playerRouter)
