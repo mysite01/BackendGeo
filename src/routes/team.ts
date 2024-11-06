@@ -41,6 +41,24 @@ teamRouter.delete("/:id", async (req, res, next) => {
 })
 
 /**
+ * Route für das bekommen von allen Spielern eines Teams
+ */
+teamRouter.get("/:id", async (req, res, next) => {
+    let id = "";
+    if(req.params){
+        id = req.params.id
+    }
+
+    try{
+        await TeamService.getPlayerInTeam(id)
+        res.status(201).send()
+    } catch (err){
+        res.status(404)
+        next(err)
+    }
+})
+
+/**
  * Route fürs bekommen von einem Team
  */
 teamRouter.get("/:id", async (req, res, next) => {
