@@ -1,23 +1,66 @@
+import { GameResource } from 'src/Resources';
 import { Game, IGame } from '../model/GameModel';
 
 /**
- * Erstellt ein neues Game 
+ * Erstellt ein neues Game
+ * 
  */
-export async function createGame(gameData: IGame): Promise<IGame> {
-    throw new Error("not implemented yet");
+export async function createGame(gameResource: GameResource): Promise<GameResource> {
+    try {
+        const game = new Game({
+            title: gameResource.title,
+            POIs: gameResource.POIs.map(poi => ({
+                type: "Point",
+                coordinates: poi.coordinates
+            })),
+            playersID: gameResource.playersID.map(playerId => playerId)
+        });
+
+        const savedGame = await game.save();
+
+        return {
+            id: savedGame._id.toString(),
+            title: savedGame.title,
+            POIs: savedGame.POIs.map(poi => ({
+                type: "Point",
+                coordinates: poi.coordinates
+            })),
+            playersID: savedGame.playersID.map(playerId => playerId.toString())
+        };
+    } catch (error) {
+        throw new Error("Fehler beim Erstellen des Spiels");
+    }
 }
 
 /**
  * Findet ein Game anhand der ID 
  */
-export async function getGameById(id: string): Promise<IGame | null> {
-    throw new Error("not implemented yet");
+export async function getGameById(id: string): Promise<GameResource> {
+    try {
+        const game = await Game.findById(id).exec();
+        if (!game) {
+            throw new Error("Spiel nicht gefunden");
+        }
+        return {
+            id: game._id.toString(),
+            title: game.title,
+            POIs: game.POIs.map(poi => ({
+                type: "Point",
+                coordinates: poi.coordinates
+            })),
+            playersID: game.playersID.map(playerId => playerId.toString())
+        };
+    } catch (error) {
+        throw new Error("Fehler beim Abrufen des Spiels");
+    }
 }
 
 /**
  * Löscht ein Game anhand der ID 
  */
 export async function deleteGame(id: string): Promise<void> {
-    throw new Error("not implemented yet");
+    const query = await Game.findByIdAndDelete(id).exec();
+    if(!query) {
+        throw new Error("Das Spiel mit der konnte nicht gelöscht werden!")
+    }
 }
-

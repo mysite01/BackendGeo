@@ -5,9 +5,9 @@ import * as PlayerService from "../../src/services/PlayerService"
 
 test ("Test getPlayer, korrekte eingaben", async()=>{
     const newPlayer = await PlayerService.createPlayer({name: "Thomas", gameId: "1"})
-    const id = newPlayer.id;
+
     const testee = supertest(app)
-    const response = await testee.get(`/api/player/${id}`)
+    const response = await testee.get(`/api/player/${newPlayer.id}`)
     expect(response.statusCode).toBe(200)
 })
 

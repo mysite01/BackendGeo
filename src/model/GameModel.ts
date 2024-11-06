@@ -2,29 +2,31 @@ import mongoose from "mongoose";
 
 export interface IGame {
     title: string; 
-    location: {
-        type: string,  
-        coordinates: [number, number],  
-    };
-    playersID?: mongoose.Schema.Types.ObjectId[]; //Später bearbeiten für Liste der Spieler im Game
+    POIs: {
+        type: string,
+        coordinates: [number, number],
+    }[];
+    playersID: mongoose.Schema.Types.ObjectId[]; 
 }
 
 const gameSchema = new mongoose.Schema<IGame>(
     {
-        title: { type: String, required: true },  
-        location: { //GeoJSON format für den Standort
+        title: { type: String, required: true },
+        POIs: [{
             type: {
                 type: String,
-                enum: ['Point'],  
+                enum: ['Point'],
                 required: true
             },
             coordinates: {
-                type: [Number],  
+                type: [Number],
                 required: true
             }
-        },
-        playersID: [{ type: String, 
-            ref: 'Player' }]
+        }],
+        playersID: [{ 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Player'
+        }]
     }
 );
 

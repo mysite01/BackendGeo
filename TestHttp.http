@@ -1,0 +1,12 @@
+###
+POST http://localhost:3000/api/player
+Content-Type: application/json
+
+{
+    "name": "Monster",
+    "gameId": "1"
+}
+
+
+###
+GET http://localhost:3000/api/player/6724c6ea6be7c5caaf71ee0f

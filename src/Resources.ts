@@ -8,9 +8,26 @@ export type PlayerResource = {
 export type GameResource = {
     id?: string;  
     title: string;  
-    location: {
-        type: "Point";  
-        coordinates: [number, number]; 
-    };
-    players?: string[];
+    POIs: {
+        type: "Point";
+        coordinates: [number, number];
+    }[];
+    playersID: string[];
 }
+
+export type GameInstanceResource = {
+    id?: string;
+    name?: string;
+    status: number; 
+    startTime: string; 
+    endTime: string;
+    gameID: string;
+    teamsID: string[];
+}
+
+export type TeamResource = {
+    id?: string;
+    name: string;
+    playersID: string[]; 
+    createdAt?: string;
+};
