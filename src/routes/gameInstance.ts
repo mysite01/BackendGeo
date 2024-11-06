@@ -1,7 +1,5 @@
 import express from "express";
-import { GameInstanceResource } from "src/Resources";
-import * as GameInstanceService from "../services/GameInstanceService"
-import { createGameInstance } from "../services/GameInstanceService";
+import { createGameInstance, getGameInstanceById } from "../services/GameInstanceService";
 
 
 export const gameInstanceRouter = express.Router();
@@ -23,7 +21,14 @@ gameInstanceRouter.post("/", async (req, res, next) => {
  * Route zum Abrufen einer GameInstance anhand der ID.
  */
 gameInstanceRouter.get("/:id", async (req, res, next) => {
-    throw new Error("not implemented yet");
+    try {
+        const gameInstanceId = req.params.id;
+        const gameInstance = await getGameInstanceById(gameInstanceId);
+        res.status(200).json(gameInstance);
+    } catch (error) {
+        res.status(404).json({ error: `GameInstance mit der ID ${req.params.id} wurde nicht gefunden.` });
+        next(error);
+    }
 });
 
 /**
