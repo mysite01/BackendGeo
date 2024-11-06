@@ -50,8 +50,8 @@ teamRouter.get("/:id", async (req, res, next) => {
     }
 
     try{
-        await TeamService.getPlayerInTeam(id)
-        res.status(201).send()
+        const players = await TeamService.getPlayerInTeam(id)
+        res.status(201).send(players)
     } catch (err){
         res.status(404)
         next(err)
