@@ -31,3 +31,12 @@ export type TeamResource = {
     playersID: string[]; 
     createdAt?: string;
 };
+
+export type POIResource = {
+    id?: string;
+    name: string;
+    lat: number;
+    long: number;
+    beschreibung: string;
+    punkte: number;
+};
