@@ -5,6 +5,8 @@ import {playerRouter} from './routes/player'
 import {gameRouter} from './routes/game'
 import {gameInstanceRouter} from './routes/gameInstance'
 import { teamRouter } from './routes/team';
+import poiRouter from './routes/POI';
+
 
 import cors from 'cors';
 
@@ -35,5 +37,6 @@ app.use("/api/player", playerRouter)
 app.use("/api/game", gameRouter);
 app.use("/api/gameInstance", gameInstanceRouter);
 app.use("/api/team", teamRouter)
+app.use("/api/poi", poiRouter); 
 
 export default app;
