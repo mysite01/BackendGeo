@@ -37,6 +37,6 @@ app.use("/api/player", playerRouter)
 app.use("/api/game", gameRouter);
 app.use("/api/gameInstance", gameInstanceRouter);
 app.use("/api/team", teamRouter)
-app.use("/api/poi", poiRouter); 
+app.use("/api/POI", poiRouter); 
 
 export default app;
