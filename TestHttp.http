@@ -9,6 +9,12 @@ Content-Type: application/json
 
 
 ###
+<<<<<<< HEAD
+=======
+GET http://localhost:3443/api/player/6724c6ea6be7c5caaf71ee0f
+
+###
+>>>>>>> 66736265166c6758ab42ea732e56bcb66ff636f3
 GET http://localhost:3443/api/player/672b4c851d3e7a031591033a
 
 ###
