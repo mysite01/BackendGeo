@@ -4,6 +4,7 @@ import "express-async-errors";
 import {playerRouter} from './routes/player'
 import {gameRouter} from './routes/game'
 import { teamRouter } from './routes/team';
+import  userRouter  from './routes/user';
 
 import cors from 'cors';
 
@@ -32,6 +33,7 @@ app.get('/', (req: Request, res: Response) => {
 //Routes
 app.use("/api/player", playerRouter)
 app.use("/api/game", gameRouter);
-app.use("/api/team", teamRouter)
+app.use("/api/team", teamRouter);
+app.use("/api/user", userRouter)
 
 export default app;

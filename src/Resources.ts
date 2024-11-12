@@ -35,5 +35,5 @@ export type UserResource = {
     id?: string;
     name: string;
     password: string;
-    createdAt: Date;
+    createdAt?: Date;
 };
