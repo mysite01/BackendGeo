@@ -14,9 +14,26 @@ export interface GameResource {
         coordinates: [number, number];
     }[];
 }
+
+export type GameInstanceResource = {
+    id?: string;
+    name?: string;
+    status: number; 
+    startTime: string; 
+    endTime: string;
+    gameID: string;
+    teamsID: string[];
+}
+
 export type TeamResource = {
     id?: string;
     name: string;
     playersID: string[]; 
     createdAt?: string;
+};
+export type UserResource = {
+    id?: string;
+    name: string;
+    password: string;
+    createdAt: Date;
 };

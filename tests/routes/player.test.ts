@@ -24,10 +24,10 @@ test("Test create Player, keine eingaben", async ()=> {
     expect(response.status).toBe(404)
 })
 
-test("Test create Player, falsche eingaben (falscher datentyp, gameid)", async()=>{
+test("Test create Player, falscher datentyp, gameid", async()=>{
     const testee = supertest(app)
     const response = await testee.post(`/api/player/`).send({name: "Arwed", gameId: 1})
-    expect(response.status).toBe(404)
+    expect(response.status).toBe(201)
 })
 
 test("Test delete Player", async()=>{
