@@ -3,8 +3,8 @@ import "express-async-errors";
 
 import {playerRouter} from './routes/player'
 import {gameRouter} from './routes/game'
-import { teamRouter } from './routes/team';
-import  userRouter  from './routes/user';
+import { teamRouter } from './routes/team'
+import { userRouter } from './routes/user'
 
 import cors from 'cors';
 

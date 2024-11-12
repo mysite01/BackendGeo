@@ -29,13 +29,10 @@ export async function createUser(userResource: UserResource): Promise<UserResour
 /**
  * Löscht einen Benutzer anhand der ID
  */
-export async function deleteUser(id: string): Promise<void> {
-    const query = await User.findByIdAndDelete(id).exec();
-    if (!query) {
-        throw new Error("Der Benutzer konnte nicht gelöscht werden!");
-    }
+export async function deleteUser(id: string): Promise<boolean> {
+    const result = await User.findByIdAndDelete(id);
+    return result !== null;  // Gibt `true` zurück, wenn ein Benutzer gelöscht wurde, `false` wenn kein Benutzer gefunden wurde
 }
-
 /**
  * Holt alle Benutzer anhand der ID
  */
