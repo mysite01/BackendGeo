@@ -31,14 +31,12 @@ export type TeamResource = {
     playersID: string[]; 
     createdAt?: string;
 };
-<<<<<<< HEAD
 export type UserResource = {
     id?: string;
     name: string;
     password: string;
     createdAt?: Date;
 };
-=======
 
 export type POIResource = {
     id?: string;
@@ -48,4 +46,3 @@ export type POIResource = {
     beschreibung: string;
     punkte: number;
 };
->>>>>>> 66736265166c6758ab42ea732e56bcb66ff636f3
