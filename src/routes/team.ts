@@ -1,21 +1,31 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import * as TeamService from "../services/TeamService"
+import * as PlayerService from "../services/PlayerService"
+import {  Player } from "../model/PlayerModel";
 import { TeamResource } from "src/Resources";
-import { Team } from "src/model/TeamModel";
+import { ITeam} from "src/model/TeamModel";
+import { Team } from "../model/TeamModel";
+import { generateQAcode } from "../utils/Qacodegenerate";
+
 
 //TODO: mit ExpressValidator Input validieren
 
 
 export const teamRouter = express.Router();
 
+
 /**
  * Route für erstellen von team
  * 
  */
 teamRouter.post("/", async (req, res, next) =>{
+    console.log("name nickName.......",req.body);
+    const nameofTeam = req.body.nameOfTeam;
+
     try{
-        const newTeam = await TeamService.createTeam(req.body)
-        res.status(201).send(newTeam)
+        const createNewTeam = await TeamService.createTeam(req.body, nameofTeam)
+        res.status(201).send(createNewTeam)
+        
     } catch (err){
         res.status(404)
         next(err)
@@ -40,27 +50,76 @@ teamRouter.delete("/:id", async (req, res, next) => {
     }
 })
 
-/**
- * Route für das bekommen von allen Spielern eines Teams
- */
-teamRouter.get("/:id", async (req, res, next) => {
-    let id = "";
-    if(req.params){
-        id = req.params.id
-    }
 
-    try{
-        const players = await TeamService.getPlayerInTeam(id)
-        res.status(201).send(players)
-    } catch (err){
-        res.status(404)
-        next(err)
-    }
-})
 
 /**
- * Route fürs bekommen von einem Team
+ * Route update Team
  */
-teamRouter.get("/:id", async (req, res, next) => {
-    throw new Error("not implemented yet")
-})
+teamRouter.put("/:id", async (req, res, next) => {
+    try {
+        const teamId = req.params.id;
+        const {playerID, action} = req.body;
+        console.log("action......",action)
+        if(action === "remove"){
+            const updatedPlayerInTeam = await TeamService.updateDeletePlayerInTeam(teamId, req.body);
+            console.log("updatedPlayerInTeam DELETE Data......", updatedPlayerInTeam)
+            res.status(200).send(updatedPlayerInTeam);  
+        }else{
+            const updatedTeam = await TeamService.updateTeam(teamId, req.body);
+            console.log("updatedTeam... Data......", updatedTeam)
+            
+            res.status(200).send(updatedTeam);  
+        }
+         
+    } catch (err) {
+        res.status(404); 
+        next(err); 
+    }
+});
+
+
+teamRouter.get("/:codeInvite", async (req: Request<{ codeInvite: string }>, res: Response, next: NextFunction): Promise<void> => {
+    console.log("QACode......",req.params.codeInvite)
+    const codeInvite = req.params.codeInvite;
+
+    try {
+        // Call the service function
+        const teams: ITeam[] = await TeamService.getTeamsByQACode(codeInvite);
+
+        if (teams.length === 0) {
+           res.status(404).json({ message: "No teams found for this QACode." });
+        }
+
+        const playerIDs = teams.flatMap(team => team.players).map(id => id.toString());
+
+        // Hole alle Spieler-Daten auf einmal
+        const playersData = await Player.find({ _id: { $in: playerIDs } }).select("nickName gameId").lean();
+
+        // Spieler-Daten in die Map einfügen
+        const playerDataMap = new Map<string, { nickName: string; host:boolean }>();
+        playersData.forEach(player => {
+                playerDataMap.set(player._id.toString(), { nickName: player.nickName, host:player.host });
+        });
+
+        // Erzeuge das neue Team-Array mit den Spieler-Details
+        const newTeams = teams.map(team => ({
+            _id: team._id,
+            name: team.name,
+            players: team.players.map(playerId => {
+                const playerData = playerDataMap.get(playerId.toString());
+                return {
+                    id: playerId.toString(),
+                    nickName: playerData ? playerData.nickName : 'Unbekannter Spieler',
+                };
+            }),
+            codeInvite: team.codeInvite,
+        }));
+
+        // Return the teams found
+        res.status(200).json(newTeams);
+    } catch (error) {
+        console.error("Error fetching team data:", error);
+        res.status(500).json({ message: "Error fetching team data." });
+        next(error);  // Pass the error to the next error handler if defined
+    }
+});

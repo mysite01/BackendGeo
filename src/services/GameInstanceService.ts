@@ -8,7 +8,7 @@ import { Types } from "mongoose";
 export async function createGameInstance(data: GameInstanceResource): Promise<GameInstanceResource> {
     const gameInstance = new GameInstance({
         name: data.name,
-        status: data.status,
+        status: "0",
         startTime: new Date(data.startTime),
         endTime: new Date(data.endTime),
         game: new Types.ObjectId(data.gameID),

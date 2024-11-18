@@ -1,22 +1,28 @@
 import mongoose from 'mongoose'
 
 export interface IPlayer {
-    name: string;
-    gameId: mongoose.Schema.Types.ObjectId;
+    nickName: string;
     createdAt?: Date;
+    joinedAtInTeam?: Date;
+    leftAtInTeam?: Date;
+    host:boolean;
+    teamId?: mongoose.Schema.Types.ObjectId;
+    
 }
 
 const playerSchema = new mongoose.Schema<IPlayer>(
     {
-        name: {type: String, required: true},
-        gameId: {
-            type: String, 
-            required: true,
-            ref: "IGame"
-        }
+        nickName: {type: String, required: true},
+        joinedAtInTeam: { type: Date }, 
+        leftAtInTeam: { type: Date }, 
+        host: { type: Boolean, required: true }, 
+        teamId: [{ type: String, 
+            
+            ref: "Team" }],
+     
     },
     {
-        timestamps: true,
+        timestamps: true, 
     }
 )
 

@@ -1,8 +1,12 @@
 export type PlayerResource = {
     id?: string
-    name: string
-    gameId: string
+    nickName: string
     createdAt?: string 
+    joinedAtInTeam?: string | null;
+    leftAtInTeam?: string | null;
+    host:Boolean;
+    teamId:string;
+    
 }
 
 export interface GameResource {
@@ -28,8 +32,10 @@ export type GameInstanceResource = {
 export type TeamResource = {
     id?: string;
     name: string;
-    playersID: string[]; 
+    codeInvite: string;
     createdAt?: string;
+    poiId: string[];
+    playersID: string[]; // must del
 };
 export type UserResource = {
     id?: string;

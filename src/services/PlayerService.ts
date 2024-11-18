@@ -1,18 +1,19 @@
 import { PlayerResource } from "../../src/Resources";
-import { Player } from "../model/PlayerModel";
+import { IPlayer, Player } from "../model/PlayerModel";
 
 
 /**
  * gibt alle Spieler aus einem bestimmten Game als
  * Array zurück
  */
-export async function getAllPlayers(gameId: string): Promise<PlayerResource[]> {
-    const playerList = await Player.find({ gameId }).exec();
+export async function getAllPlayers(): Promise<PlayerResource[]> {
+    const playerList = await Player.find();
     
     const data = playerList.map(player => ({
         id: player._id.toString(),  
-        name: player.name,
-        gameId: player.gameId.toString(), 
+        nickName: player.nickName,
+        host:player.host,
+        teamId: "12354",
         createdAt: player.createdAt ? player.createdAt.toISOString() : new Date().toISOString(),
     }));
 
@@ -30,16 +31,17 @@ export async function getAllPlayers(gameId: string): Promise<PlayerResource[]> {
  */
 export async function getPlayer(id:string): Promise<PlayerResource> {
     const player = await Player.findById(id).exec();
-
+console.log("playerssssssss.......", player);
     if (!player) {
         throw new Error(`Player mit ID ${id} nicht gefunden`);
     }
 
     const playerResource: PlayerResource = {
         id: player._id.toString(),
-        name: player.name,
-        gameId: player.gameId.toString(),
+        nickName: player.nickName,
+        teamId: "1234",
         createdAt: player.createdAt ? player.createdAt.toISOString() : new Date().toISOString(),
+        host:player.host, 
     };
 
     return playerResource;
@@ -54,16 +56,19 @@ export async function getPlayer(id:string): Promise<PlayerResource> {
  */
 export async function createPlayer(playerResource: PlayerResource):Promise<PlayerResource> {
     const neuerSpieler = new Player({
-        name: playerResource.name,
-        gameId: playerResource.gameId,
+        nickName: playerResource.nickName,
         createdAt: new Date(),
+        host: playerResource.host,
+        teamId: playerResource.teamId,
     });
     const gespeicherterSpieler = await neuerSpieler.save();
     const spielerOhnePasswort: PlayerResource = {
         id: gespeicherterSpieler._id.toString(), 
-        name: gespeicherterSpieler.name,         
-        gameId: gespeicherterSpieler.gameId.toString(), 
+        nickName: gespeicherterSpieler.nickName,  
+        host:gespeicherterSpieler.host, 
+        teamId: "12345",
         createdAt: gespeicherterSpieler.createdAt ? gespeicherterSpieler.createdAt.toISOString() : new Date().toISOString(), 
+        
     };
     return spielerOhnePasswort;
 }
@@ -79,3 +84,4 @@ export async function deletePlayer(id:string):Promise<void> {
         throw new Error(`Couldnt delete Eintrag with id ${id}`);
     }
 }
+

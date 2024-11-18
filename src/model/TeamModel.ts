@@ -2,12 +2,16 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface ITeam extends Document {
     name: string;
-    players: Types.ObjectId[];
+    codeInvite: string;
+    poiId:Types.ObjectId[];
+    players: Types.ObjectId[]; // must del
 }
 
 const teamSchema = new Schema<ITeam>({
     name: { type: String, required: true },
-    players: [{ type: Schema.Types.ObjectId, ref: 'Player' }]  // Referenziert die Player-Dokumente
+    codeInvite: { type: String, required: true },
+    poiId: [{ type: Schema.Types.ObjectId, ref: 'PositionClaimed' }],
+    players: [{ type: Schema.Types.ObjectId, ref: 'Player' }], // must del
 });
 
 export const Team = mongoose.model<ITeam>('Team', teamSchema);
