@@ -9,20 +9,19 @@ export async function createUser(userResource: UserResource): Promise<UserResour
     try {
         const user = new User({
             name: userResource.name,
-            password: userResource.password,
-            createdAt: new Date()
+            password: userResource.password, // Passwort wird im Model gehasht
+            createdAt: new Date(),
         });
 
-        const savedUser = await user.save() as IUser & { _id: Types.ObjectId }; 
+        const savedUser = await user.save();
 
         return {
-            id: savedUser._id.toString(), 
+            id: savedUser._id.toString(),
             name: savedUser.name,
-            password: savedUser.password,
-            createdAt: savedUser.createdAt
+            createdAt: savedUser.createdAt,
         };
-    } catch (error) {
-        throw new Error("Fehler beim Erstellen des Benutzers");
+    } catch (error: any) {
+        throw new Error(`Fehler beim Erstellen des Benutzers: ${error.message}`);
     }
 }
 

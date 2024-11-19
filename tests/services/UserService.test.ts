@@ -19,7 +19,7 @@ describe("UserService Tests", () => {
 
         expect(createdUser).toBeTruthy();
         expect(createdUser.name).toBe(userData.name);
-        expect(createdUser.password).toBe(userData.password);
+        expect(createdUser.password).not.toBe(userData.password);
         expect(createdUser).toHaveProperty("createdAt");
     });
 

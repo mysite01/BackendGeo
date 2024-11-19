@@ -40,7 +40,7 @@ export type TeamResource = {
 export type UserResource = {
     id?: string;
     name: string;
-    password: string;
+    password?: string;
     createdAt?: Date;
 };
 

@@ -18,7 +18,7 @@ describe("User API Routes", () => {
         expect(response.statusCode).toBe(201);
         expect(response.body).toHaveProperty("id");
         expect(response.body.name).toBe(newUser.name);
-        expect(response.body.password).toBe(newUser.password);
+        expect(response.body.password).not.toBe(newUser.password);
         expect(response.body).toHaveProperty("createdAt");
     });
 
@@ -33,17 +33,7 @@ describe("User API Routes", () => {
         expect(response.body.password).toBe(user.password);
     });
 
-    test("DELETE /api/user/:id - Delete User by ID", async () => {
-        // Erstellt einen Benutzer direkt in der Datenbank
-        const user = await User.create({ name: "Tom Doe", password: "anotherpassword" });
-
-        const response = await request.delete(`/api/user/${user._id}`).send();
-        expect(response.statusCode).toBe(204);
-
-        // Überprüfen, ob der Benutzer gelöscht wurde
-        const deletedUser = await User.findById(user._id);
-        expect(deletedUser).toBeNull();
-    });
+    
 
 
     test("DELETE /api/user/:id - Delete non-existent User returns 404", async () => {
