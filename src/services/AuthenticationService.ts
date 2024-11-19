@@ -1,19 +1,32 @@
 import { User } from "../model/UserModel";
+import jwt from "jsonwebtoken";
 
 /**
- * Prüft Name und Passwort, bei Erfolg wird die `id` zurückgegeben.
- * Falls kein Benutzer mit dem gegebenen Namen existiert oder das Passwort falsch ist,
- * wird `false` zurückgegeben. Es werden keine weiteren Hinweise aus Sicherheitsgründen gegeben.
+ * Prüft Name und Passwort. Bei Erfolg wird die Benutzer-ID und ein JWT zurückgegeben.
  */
-export async function login(name: string, password: string): Promise<{ id: string } | false> {
+export async function login(name: string, password: string): Promise<{ id: string; token: string } | false> {
     const user = await User.findOne({ name }).exec();
 
     if (user && await user.isCorrectPassword(password)) {
+
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error("Umgebungsvariable JWT_SECRET ist nicht gesetzt.");
+        }
+        const expiresIn = "1h"; // Token läuft nach 1 Stunde ab
+        const token = jwt.sign(
+            { id: user._id.toString() }, // Payload
+            secret,
+            { expiresIn }
+        );
+
         return {
             id: user._id.toString(),
+            token,
         };
     }
-    return false;
+
+    return false; // Login fehlgeschlagen
 }
 
 /**

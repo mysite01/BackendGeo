@@ -1,20 +1,7 @@
-###
-POST http://localhost:3443/api/player
+POST http://localhost:3443/api/user/register
 Content-Type: application/json
 
 {
-    "name": "Monster",
-    "gameId": "1"
-}
-
-###
-POST http://localhost:3443/api/POI
-Content-Type: application/json
-
-{
-    "name": "Brandenburger Tor",
-    "lat": 52.5163,
-    "long": 13.3777,
-    "beschreibung": "Historisches Wahrzeichen in Berlin.",
-    "punkte": 10
+    "name": "testuser",
+    "password": "testpassword123"
 }

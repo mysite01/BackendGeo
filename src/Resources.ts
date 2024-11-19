@@ -52,3 +52,9 @@ export type POIResource = {
     beschreibung: string;
     punkte: number;
 };
+
+export type LoginResource = {
+    id: string;        
+    token: string;     
+    expiresAt?: Date;  
+};

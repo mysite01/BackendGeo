@@ -7,6 +7,11 @@ import app from "./app";
 
 async function setup() {
    // let mongodURI = process.env.DB_CONNECTION_STRING;
+   console.log("USE_SSL:", process.env.USE_SSL);
+   console.log("HTTP_PORT:", process.env.HTTP_PORT);
+   console.log("JWT_SECRET:", process.env.JWT_SECRET);
+   console.log("DB_CONNECTION_STRING:", process.env.DB_CONNECTION_STRING);
+   
       let mongodURI = "memory"
     if (!mongodURI) {
         console.error(`Cannot start`);
