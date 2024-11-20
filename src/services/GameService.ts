@@ -1,84 +1,67 @@
-import { GameResource } from "../../src/Resources";
-import { IGame, Game } from "../model/GameModel";
-
-
-/**
- * Gibt alle Games zurück
- */
-export async function getAllGames(): Promise<GameResource[]> {
-    const games = await Game.find();
-
-    return games.map(game => ({
-        title: game.title,
-        beschreibung: game.beschreibung || "",
-        poilId: game.poilId ? game.poilId.map(id => id.toString()) : [],
-        maxTeam: game.maxTeam,
-        userId: game.userId.toString(),
-        POIs: game.poilId?.map(id => ({
-            type: "Point",
-            coordinates: [0, 0], // Beispielkoordinaten, da keine echten POIs im Schema definiert sind
-        })) || [],
-    }));
-}
+import mongoose, { Types } from "mongoose";
+import { Game, IGame } from "../model/GameModel";
+import { GameResource } from "src/Resources";
 
 /**
- * Gibt ein Game anhand der ID zurück.
- * Falls kein Game gefunden wird, wird ein Fehler geworfen.
- */
-export async function getGameById(id: string): Promise<GameResource> {
-    const game = await Game.findById(id).exec();
-
-    if (!game) {
-        throw new Error(`Game mit ID ${id} nicht gefunden`);
-    }
-
-    return {
-        title: game.title,
-        beschreibung: game.beschreibung || "",
-        poilId: game.poilId ? game.poilId.map(id => id.toString()) : [],
-        maxTeam: game.maxTeam,
-        userId: game.userId.toString(),
-        POIs: game.poilId?.map(id => ({
-            type: "Point",
-            coordinates: [0, 0], // Beispielkoordinaten
-        })) || [],
-    };
-}
-
-/**
- * Erstellt ein neues Game
+ * Erstellt ein neues Spiel
  */
 export async function createGame(gameResource: GameResource): Promise<GameResource> {
-    const neuesGame = new Game({
-        title: gameResource.title,
-        beschreibung: gameResource.beschreibung,
-        poilId: gameResource.poilId,
-        maxTeam: gameResource.maxTeam,
-        userId: gameResource.userId,
-    });
+    try {
+        const game = new Game({
+            title: gameResource.title,
+            beschreibung: gameResource.beschreibung,
+            poilId: gameResource.poilId?.map((id) => new mongoose.Types.ObjectId(id)),
+            maxTeam: gameResource.maxTeam,
+            userId: new mongoose.Types.ObjectId(gameResource.userId),
+            POIs: gameResource.POIs || [],
+        });
 
-    const gespeichertesGame = await neuesGame.save();
+        const savedGame = await game.save();
 
-    return {
-        title: gespeichertesGame.title,
-        beschreibung: gespeichertesGame.beschreibung || "",
-        poilId: gespeichertesGame.poilId ? gespeichertesGame.poilId.map(id => id.toString()) : [],
-        maxTeam: gespeichertesGame.maxTeam,
-        userId: gespeichertesGame.userId.toString(),
-        POIs: gespeichertesGame.poilId?.map(id => ({
-            type: "Point",
-            coordinates: [0, 0], // Beispielkoordinaten
-        })) || [],
-    };
+        return {
+            id: savedGame._id.toString(),
+            title: savedGame.title,
+            beschreibung: savedGame.beschreibung,
+            poilId: savedGame.poilId?.map((id) => id.toString()),
+            maxTeam: savedGame.maxTeam,
+            userId: savedGame.userId.toString(),
+            POIs: gameResource.POIs || [],
+        };
+    } catch (error: any) {
+        throw new Error(`Fehler beim Erstellen des Spiels: ${error.message}`);
+    }
 }
 
 /**
- * Löscht ein Game anhand der ID
+ * Löscht ein Spiel anhand der ID
  */
-export async function deleteGame(id: string): Promise<void> {
-    const query = await Game.findByIdAndDelete(id).exec();
-    if (!query) {
-        throw new Error(`Game mit ID ${id} konnte nicht gelöscht werden`);
+export async function deleteGame(id: string): Promise<boolean> {
+    const result = await Game.findByIdAndDelete(id);
+    return result !== null; // Gibt `true` zurück, wenn ein Spiel gelöscht wurde, `false`, wenn kein Spiel gefunden wurde
+}
+
+/**
+ * Holt ein Spiel anhand der ID
+ */
+export async function getGameById(gameId: string): Promise<GameResource> {
+    try {
+        const game = await Game.findById(gameId).exec();
+
+        if (!game) {
+            throw new Error("Spiel nicht gefunden"); // Diese Fehlermeldung wird erwartet
+        }
+
+        return {
+            id: game._id.toString(),
+            title: game.title,
+            beschreibung: game.beschreibung || "",
+            poilId: game.poilId?.map((id) => id.toString()),
+            maxTeam: game.maxTeam,
+            userId: game.userId.toString(),
+            POIs: [], // Standardwert für POIs
+        };
+    } catch (error) {
+        throw new Error("Spiel nicht gefunden"); // Einheitliche Fehlermeldung
     }
 }
 

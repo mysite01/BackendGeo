@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IGame extends Document {
+    _id: mongoose.Types.ObjectId; // Typisiere `_id` explizit
     title: string;
     beschreibung?: string;
-    poilId?: mongoose.Types.ObjectId[]; // Array von ObjectIds, die auf POI-Listen verweisen
-    maxTeam: number; // Maximale Anzahl von Teams
-    userId: mongoose.Types.ObjectId; // Verweis auf den Benutzer
+    poilId?: mongoose.Types.ObjectId[];
+    maxTeam: number;
+    userId: mongoose.Types.ObjectId;
 }
 
 const gameSchema = new Schema<IGame>(
@@ -20,7 +21,7 @@ const gameSchema = new Schema<IGame>(
         ],
         maxTeam: { type: Number, required: true },
         userId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId as typeof Schema.Types.ObjectId,
             ref: "User", // Verweis auf das `User`-Modell
             required: true,
         },
@@ -28,4 +29,3 @@ const gameSchema = new Schema<IGame>(
 );
 
 export const Game = mongoose.model<IGame>("Game", gameSchema);
-

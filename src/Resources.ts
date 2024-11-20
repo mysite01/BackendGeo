@@ -13,7 +13,7 @@ export interface GameResource {
     id?: string;
     title: string;
     beschreibung?: string;
-    POIs: {
+    POIs?: {
         type: string;
         coordinates: [number, number];
     }[];
