@@ -17,6 +17,9 @@ export interface GameResource {
         type: string;
         coordinates: [number, number];
     }[];
+    poilId?: string[]; 
+    maxTeam: number; 
+    userId: string; 
 }
 
 export type GameInstanceResource = {
