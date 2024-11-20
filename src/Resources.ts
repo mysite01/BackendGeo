@@ -61,3 +61,8 @@ export type LoginResource = {
     token: string;     
     expiresAt?: Date;  
 };
+export interface POIListResource {
+    id?: string;
+    name: string; 
+    poilId: string[]; 
+}

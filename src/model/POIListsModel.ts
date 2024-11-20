@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IPOIList extends Document {
+    _id: mongoose.Types.ObjectId;
     name: string;
     poilId: Types.ObjectId[]; // Array von ObjectIds, die auf POIs verweisen
 }
