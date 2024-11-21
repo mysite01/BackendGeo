@@ -7,12 +7,14 @@ import { teamRouter } from './routes/team';
 import {gameInstanceRouter} from './routes/gameInstance'
 import { userRouter } from './routes/user';
 import { poiListRouter } from './routes/POILists';
-
+import cookieParser from "cookie-parser";
+import { loginRouter } from './routes/login';
 
 import cors from 'cors';
 
 const app = express();
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(cors());
@@ -42,6 +44,7 @@ app.use("/api/gameInstance", gameInstanceRouter);
 app.use("/api/team", teamRouter);
 app.use("/api/user", userRouter);
 app.use('/api/poilist', poiListRouter);
+app.use("/api/login", loginRouter); 
 
 
 export default app;
