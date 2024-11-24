@@ -9,6 +9,9 @@ import { userRouter } from './routes/user';
 import { poiListRouter } from './routes/POILists';
 import cookieParser from "cookie-parser";
 import { loginRouter } from './routes/login';
+import { GameResource } from "src/Resources";
+import { Types } from "mongoose";
+import * as GameService from "./services/GameService";
 
 import cors from 'cors';
 
@@ -31,6 +34,40 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.set("Access-Control-Allow-Credentials", "true");
   next();
 });
+
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  console.log("beginning to insert game in database")
+  try {
+    const gameData: GameResource = {
+      title: "Berlin Sehenswürdigkeiten",
+      beschreibung: "Einige der bekanntesten Sehenswürdigkeiten in Berlin",
+      POIs: [
+        {
+          type: "Point",
+          coordinates: [13.404954, 52.520008], // Brandenburger Tor
+        },
+        {
+          type: "Point",
+          coordinates: [13.377704, 52.516275], // Reichstag
+        },
+      ],
+      poilId: [new Types.ObjectId().toString()],
+      maxTeam: 5,
+      userId: new Types.ObjectId().toString(),
+    };
+
+    await GameService.createGame(gameData);
+
+    res.status(201)
+    console.log("game created")
+  } catch (error) {
+    console.log('Error creating game:', error);
+    res.status(500)
+  }
+  next();
+});
+
+
 
 // Beispielroute
 app.get('/', (req: Request, res: Response) => {
