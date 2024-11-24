@@ -14,6 +14,7 @@ import { Types } from "mongoose";
 import * as GameService from "./services/GameService";
 
 import cors from 'cors';
+import { authenticationRoutes } from './routes/AuthenticationRoutes';
 
 const app = express();
 app.use(cors());
@@ -82,6 +83,7 @@ app.use("/api/team", teamRouter);
 app.use("/api/user", userRouter);
 app.use('/api/poilist', poiListRouter);
 app.use("/api/login", loginRouter); 
+app.use("/api/authenticate", authenticationRoutes);
 
 
 export default app;

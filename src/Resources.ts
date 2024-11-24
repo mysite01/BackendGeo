@@ -5,7 +5,7 @@ export type PlayerResource = {
     joinedAtInTeam?: string | null;
     leftAtInTeam?: string | null;
     host:Boolean;
-    teamId:string;
+    teamId:string | null;
     
 }
 
@@ -36,6 +36,8 @@ export type TeamResource = {
     id?: string;
     name: string;
     codeInvite: string;
+    qaCode: string;
+    shareUrl:string;
     createdAt?: string;
     poiId: string[];
     playersID: string[]; // must del

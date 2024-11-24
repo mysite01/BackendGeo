@@ -7,6 +7,11 @@ import { UserResource } from 'src/Resources';
  */
 export async function createUser(userResource: UserResource): Promise<UserResource> {
     try {
+        const existingUser = await User.findOne({ name: userResource.name }).exec();
+        if (existingUser) {
+            throw new Error("Benutzername existiert bereits.");
+        }
+
         const user = new User({
             name: userResource.name,
             password: userResource.password, // Passwort wird im Model gehasht
@@ -53,3 +58,29 @@ export async function getUserById(userId: string): Promise<UserResource> {
         throw new Error("Fehler beim Abrufen des Benutzers");
     }
 }
+
+/**
+ * 
+ * @param name 
+ * @returns 
+ */
+export async function getUserByName(name: string): Promise<UserResource> {
+    try {
+        const user = await User.findOne({ name }).exec();
+
+        if (!user) {
+            throw new Error("Benutzer nicht gefunden");
+        }
+
+        return {
+            id: (user._id as Types.ObjectId).toString(), // _id explizit als ObjectId behandeln und in einen String umwandeln
+            name: user.name,
+            password: user.password,
+            createdAt: user.createdAt
+        };
+    } catch (error) {
+        throw new Error("Fehler beim Abrufen des Benutzers");
+    }
+}
+
+

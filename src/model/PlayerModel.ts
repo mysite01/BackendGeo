@@ -6,7 +6,7 @@ export interface IPlayer {
     joinedAtInTeam?: Date;
     leftAtInTeam?: Date;
     host:boolean;
-    teamId?: mongoose.Schema.Types.ObjectId;
+    teamId?: mongoose.Types.ObjectId;
     
 }
 
@@ -16,9 +16,7 @@ const playerSchema = new mongoose.Schema<IPlayer>(
         joinedAtInTeam: { type: Date }, 
         leftAtInTeam: { type: Date }, 
         host: { type: Boolean, required: true }, 
-        teamId: [{ type: String, 
-            
-            ref: "Team" }],
+        teamId: { type: mongoose.Schema.Types.ObjectId, ref: "Team" },
      
     },
     {
