@@ -84,9 +84,6 @@ export async function deletePlayer(id:string):Promise<void> {
     }
 }
 
-
-export function getPlayersByGameId(gameId: string) {
-    throw new Error("Function not implemented.");
 /**
  * delete teamid in player
  */
