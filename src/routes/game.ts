@@ -53,3 +53,27 @@ gameRouter.get("/:id", async (req, res, next) => {
         next(err);
     }
 });
+
+/**
+ * Route zum Abrufen aller POIs eines Spiels anhand der GameId
+ */
+gameRouter.get("/pois/:id", async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const game = await GameService.getGameById(id);
+        const poilist = game.poilId;
+        console.log(poilist)
+        if (!game) {
+            res.status(404).json({ message: "Spiel nicht gefunden" });
+            return;
+        }
+        if(!poilist){
+            res.status(404).json({ message: "keine POIs in Game" })
+        }
+        res.status(200).send(poilist);
+    } catch (err) {
+        res.status(500).json({ message: "Fehler beim Abrufen des Spiels" });
+        next(err);
+    }
+});

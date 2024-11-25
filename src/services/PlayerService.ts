@@ -31,7 +31,6 @@ export async function getAllPlayers(): Promise<PlayerResource[]> {
  */
 export async function getPlayer(id:string): Promise<PlayerResource> {
     const player = await Player.findById(id).exec();
-console.log("playerssssssss.......", player);
     if (!player) {
         throw new Error(`Player mit ID ${id} nicht gefunden`);
     }
