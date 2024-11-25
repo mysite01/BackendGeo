@@ -5,26 +5,23 @@ import http from "http";
 import mongoose from 'mongoose';
 import app from "./app";
 
-import { GameResource } from "src/Resources";
+import { GameResource, POIResource } from "src/Resources";
 import { Types } from "mongoose";
 import * as GameService from "./services/GameService";
+import * as POIService from "./services/POIService"
 
 
 async function createExampleGame() {
+    const poi1: POIResource = { name: "Point", lat: 52.520008, long: 13.404954, beschreibung: "Alexanderplatz", punkte: 100}
+    const poi2: POIResource = { name: "Point", lat: 52.516275, long: 13.377704, beschreibung: "Brandenburger Tor", punkte: 100}
+
+    const poi1FullData = await POIService.createPOI(poi1)
+    const poi2FullData = await POIService.createPOI(poi2)
+
     const gameData: GameResource = {
         title: "Berlin Sehenswürdigkeiten",
         beschreibung: "Einige der bekanntesten Sehenswürdigkeiten in Berlin",
-        POIs: [
-            {
-                type: "Point",
-                coordinates: [13.404954, 52.520008], // Brandenburger Tor
-            },
-            {
-                type: "Point",
-                coordinates: [13.377704, 52.516275], // Reichstag
-            },
-        ],
-        poilId: [new Types.ObjectId().toString()],
+        poilId: [poi1FullData.id!, poi2FullData.id!],
         maxTeam: 5,
         userId: new Types.ObjectId().toString(),
     };
