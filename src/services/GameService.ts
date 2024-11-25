@@ -46,7 +46,7 @@ export async function deleteGame(id: string): Promise<boolean> {
 export async function getGameById(gameId: string): Promise<GameResource> {
     try {
         const game = await Game.findById(gameId).exec();
-
+        
         if (!game) {
             throw new Error("Spiel nicht gefunden"); // Diese Fehlermeldung wird erwartet
         }
@@ -65,3 +65,27 @@ export async function getGameById(gameId: string): Promise<GameResource> {
     }
 }
 
+/**
+ * Holt ein Beispiel Spiel 
+ */
+export async function getGame(): Promise<GameResource> {
+    try {
+        const game = await Game.findOne().exec();
+        
+        if (!game) {
+            throw new Error("Spiel nicht gefunden"); // Diese Fehlermeldung wird erwartet
+        }
+
+        return {
+            id: game._id.toString(),
+            title: game.title,
+            beschreibung: game.beschreibung || "",
+            poilId: game.poilId?.map((id) => id.toString()),
+            maxTeam: game.maxTeam,
+            userId: game.userId.toString(),
+            POIs: [], // Standardwert für POIs
+        };
+    } catch (error) {
+        throw new Error("Spiel nicht gefunden"); // Einheitliche Fehlermeldung
+    }
+}

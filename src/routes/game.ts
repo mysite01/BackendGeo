@@ -55,6 +55,23 @@ gameRouter.get("/:id", async (req, res, next) => {
 });
 
 /**
+ * Route zum Abrufen eines Beispiel Spiels
+ */
+gameRouter.get("/", async (req, res, next) => {
+    try {
+        const game = await GameService.getGame();
+        if (!game) {
+            res.status(404).json({ message: "Spiel nicht gefunden" });
+            return;
+        }
+        res.status(200).send(game);
+    } catch (err) {
+        res.status(500).json({ message: "Fehler beim Abrufen des Spiels" });
+        next(err);
+    }
+});
+
+/**
  * Route zum Abrufen aller POIs eines Spiels anhand der GameId
  */
 gameRouter.get("/pois/:id", async (req, res, next) => {
