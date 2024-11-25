@@ -1,19 +1,19 @@
-import { GameResource } from 'src/Resources';
-import { Game, IGame } from '../model/GameModel';
+import mongoose, { Types } from "mongoose";
+import { Game, IGame } from "../model/GameModel";
+import { GameResource } from "src/Resources";
 
 /**
- * Erstellt ein neues Game
- * 
+ * Erstellt ein neues Spiel
  */
 export async function createGame(gameResource: GameResource): Promise<GameResource> {
     try {
         const game = new Game({
             title: gameResource.title,
-            POIs: gameResource.POIs.map(poi => ({
-                type: "Point",
-                coordinates: poi.coordinates
-            })),
-            playersID: gameResource.playersID.map(playerId => playerId)
+            beschreibung: gameResource.beschreibung,
+            poilId: gameResource.poilId?.map((id) => new mongoose.Types.ObjectId(id)),
+            maxTeam: gameResource.maxTeam,
+            userId: new mongoose.Types.ObjectId(gameResource.userId),
+            POIs: gameResource.POIs || [],
         });
 
         const savedGame = await game.save();
@@ -21,46 +21,47 @@ export async function createGame(gameResource: GameResource): Promise<GameResour
         return {
             id: savedGame._id.toString(),
             title: savedGame.title,
-            POIs: savedGame.POIs.map(poi => ({
-                type: "Point",
-                coordinates: poi.coordinates
-            })),
-            playersID: savedGame.playersID.map(playerId => playerId.toString())
+            beschreibung: savedGame.beschreibung,
+            poilId: savedGame.poilId?.map((id) => id.toString()),
+            maxTeam: savedGame.maxTeam,
+            userId: savedGame.userId.toString(),
+            POIs: gameResource.POIs || [],
         };
-    } catch (error) {
-        throw new Error("Fehler beim Erstellen des Spiels");
+    } catch (error: any) {
+        throw new Error(`Fehler beim Erstellen des Spiels: ${error.message}`);
     }
 }
 
 /**
- * Findet ein Game anhand der ID 
+ * Löscht ein Spiel anhand der ID
  */
-export async function getGameById(id: string): Promise<GameResource> {
+export async function deleteGame(id: string): Promise<boolean> {
+    const result = await Game.findByIdAndDelete(id);
+    return result !== null; // Gibt `true` zurück, wenn ein Spiel gelöscht wurde, `false`, wenn kein Spiel gefunden wurde
+}
+
+/**
+ * Holt ein Spiel anhand der ID
+ */
+export async function getGameById(gameId: string): Promise<GameResource> {
     try {
-        const game = await Game.findById(id).exec();
+        const game = await Game.findById(gameId).exec();
+
         if (!game) {
-            throw new Error("Spiel nicht gefunden");
+            throw new Error("Spiel nicht gefunden"); // Diese Fehlermeldung wird erwartet
         }
+
         return {
             id: game._id.toString(),
             title: game.title,
-            POIs: game.POIs.map(poi => ({
-                type: "Point",
-                coordinates: poi.coordinates
-            })),
-            playersID: game.playersID.map(playerId => playerId.toString())
+            beschreibung: game.beschreibung || "",
+            poilId: game.poilId?.map((id) => id.toString()),
+            maxTeam: game.maxTeam,
+            userId: game.userId.toString(),
+            POIs: [], // Standardwert für POIs
         };
     } catch (error) {
-        throw new Error("Fehler beim Abrufen des Spiels");
+        throw new Error("Spiel nicht gefunden"); // Einheitliche Fehlermeldung
     }
 }
 
-/**
- * Löscht ein Game anhand der ID 
- */
-export async function deleteGame(id: string): Promise<void> {
-    const query = await Game.findByIdAndDelete(id).exec();
-    if(!query) {
-        throw new Error("Das Spiel mit der konnte nicht gelöscht werden!")
-    }
-}

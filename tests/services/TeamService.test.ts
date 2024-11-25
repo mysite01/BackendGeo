@@ -6,10 +6,12 @@ import { Types } from "mongoose";
 test('CreateTeam with multiple players', async () => {
     const teamData: TeamResource = {
         name: "Team Alpha",
-        playersID: [new Types.ObjectId().toString(), new Types.ObjectId().toString(), new Types.ObjectId().toString()]
+        playersID: [new Types.ObjectId().toString(), new Types.ObjectId().toString(), new Types.ObjectId().toString()],
+        poiId:["12132"],
+        codeInvite:"SCD234",
     };
 
-    const createdTeam = await createTeam(teamData);
+    const createdTeam = await createTeam(teamData,teamData.name);
 
     expect(createdTeam).toBeTruthy();
     expect(createdTeam.name).toBe(teamData.name);
@@ -20,7 +22,9 @@ test('CreateTeam with multiple players', async () => {
 test('deleteTeam by ID', async () => {
     const team = await Team.create({
         name: "Team zum Löschen",
-        players: [new Types.ObjectId()]
+        players: [new Types.ObjectId()],
+        poiId:[new Types.ObjectId()],
+        codeInvite:"SCD234",
     });
 
     expect(team).toBeTruthy();
@@ -34,14 +38,14 @@ test('deleteTeam by ID', async () => {
 test('Get players in team by ID', async () => {
     const teamData: TeamResource = {
         name: "Team Bravo",
-        playersID: [new Types.ObjectId().toString(), new Types.ObjectId().toString()]
+        playersID: [new Types.ObjectId().toString(), new Types.ObjectId().toString()],
+        poiId:["12132"],
+        codeInvite:"SCD234",
     };
-
-    const createdTeam = await createTeam(teamData);
+    
+    const createdTeam = await createTeam(teamData,teamData.name);
     const fetchedPlayers = await getPlayerInTeam(createdTeam.id!);
 
     expect(fetchedPlayers).toHaveLength(2);
     expect(fetchedPlayers).toEqual(expect.arrayContaining(teamData.playersID));
 });
-
-

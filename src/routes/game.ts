@@ -1,28 +1,17 @@
 import express from "express";
-import * as GameService from "../services/GameService"
-import * as PlayerService from "../services/PlayerService"
-import { PlayerResource } from "src/Resources";
+import * as GameService from "../services/GameService";
 
 export const gameRouter = express.Router();
 
 /**
- * Route für das finden von allen Players
- * in einem Game
- */
-gameRouter.get("/:id", async (req, res, next) => {
-    throw new Error("not implemented");
-});
-
-
-/**
- * Route zum Erstellen eines neuen Games
+ * Route zum Erstellen eines neuen Spiels
  */
 gameRouter.post("/", async (req, res, next) => {
     try {
         const newGame = await GameService.createGame(req.body);
         res.status(201).send(newGame);
     } catch (err) {
-        res.status(400);
+        res.status(500).json({ message: "Fehler beim Erstellen des Spiels" });
         next(err);
     }
 });
@@ -31,16 +20,36 @@ gameRouter.post("/", async (req, res, next) => {
  * Route zum Löschen eines Spiels anhand der ID
  */
 gameRouter.delete("/:id", async (req, res, next) => {
-    let id = "";
-    if (req.params) {
-        id = req.params.id;
-    }
+    const { id } = req.params;
 
     try {
-        await GameService.deleteGame(id);
+        const wasDeleted = await GameService.deleteGame(id);
+        if (!wasDeleted) {
+            res.status(404).json({ message: "Spiel nicht gefunden" });
+            return;
+        }
         res.status(204).send();
     } catch (err) {
-        res.status(404);
+        res.status(500).json({ message: "Fehler beim Löschen des Spiels" });
+        next(err);
+    }
+});
+
+/**
+ * Route zum Abrufen eines Spiels anhand der ID
+ */
+gameRouter.get("/:id", async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const game = await GameService.getGameById(id);
+        if (!game) {
+            res.status(404).json({ message: "Spiel nicht gefunden" });
+            return;
+        }
+        res.status(200).send(game);
+    } catch (err) {
+        res.status(500).json({ message: "Fehler beim Abrufen des Spiels" });
         next(err);
     }
 });

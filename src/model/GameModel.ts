@@ -1,33 +1,31 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IGame {
-    title: string; 
-    POIs: {
-        type: string,
-        coordinates: [number, number],
-    }[];
-    playersID: mongoose.Schema.Types.ObjectId[]; 
+export interface IGame extends Document {
+    _id: mongoose.Types.ObjectId; // Typisiere `_id` explizit
+    title: string;
+    beschreibung?: string;
+    poilId?: mongoose.Types.ObjectId[];
+    maxTeam: number;
+    userId: mongoose.Types.ObjectId;
 }
 
-const gameSchema = new mongoose.Schema<IGame>(
+const gameSchema = new Schema<IGame>(
     {
         title: { type: String, required: true },
-        POIs: [{
-            type: {
-                type: String,
-                enum: ['Point'],
-                required: true
+        beschreibung: { type: String },
+        poilId: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "POILists", // Verweis auf das `POILists`-Modell
             },
-            coordinates: {
-                type: [Number],
-                required: true
-            }
-        }],
-        playersID: [{ 
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'Player'
-        }]
+        ],
+        maxTeam: { type: Number, required: true },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId as typeof Schema.Types.ObjectId,
+            ref: "User", // Verweis auf das `User`-Modell
+            required: true,
+        },
     }
 );
 
-export const Game = mongoose.model<IGame>('Game', gameSchema);
+export const Game = mongoose.model<IGame>("Game", gameSchema);
