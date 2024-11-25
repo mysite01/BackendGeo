@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request} from "express";
 import * as PlayerService from "../services/PlayerService"
 import { PlayerResource } from "src/Resources";
 
@@ -56,3 +56,40 @@ playerRouter.get("/:id", async (req, res, next) =>{
         next(err)
     }
 })
+
+/**
+ * Route für update teamId in player
+ */
+
+playerRouter.put("/:id", async (req, res, next) => {
+    try {
+        const playerId = req.params.id;
+        const {playerID, action} = req.body;
+
+        if(action === "remove"){
+            const updatedTeamIDInPlayer = await PlayerService.updateDeletePlayerInTeam(playerId, req.body);
+            res.status(200).send(updatedTeamIDInPlayer);  
+
+        }else{
+            const updatedPlayer = await PlayerService.updatePlayer(playerId, req.body);
+            res.status(200).send(updatedPlayer);  
+        }
+         
+    } catch (err) {
+        res.status(404); 
+        next(err); 
+    }
+});
+
+/**
+ * Route für das finden von  Player by teamID 
+ */
+playerRouter.get("/team/:teamId", async (req, res, next) => {
+    const teamId = req.params.teamId;
+    try {
+        const players = await PlayerService.getPlayersByTeam(teamId);
+        res.status(200).json(players);
+    } catch (err) {
+        next(err);
+    }
+});

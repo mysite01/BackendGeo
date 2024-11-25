@@ -15,7 +15,9 @@ export async function login(name: string, password: string): Promise<{ id: strin
         }
         const expiresIn = "1h"; // Token läuft nach 1 Stunde ab
         const token = jwt.sign(
-            { id: user._id.toString() }, // Payload
+            { id: user._id.toString(),
+                name:user.name,
+             }, // Payload
             secret,
             { expiresIn }
         );

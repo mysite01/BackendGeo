@@ -8,12 +8,15 @@ export const userRouter = express.Router();
  */
 userRouter.post("/", async (req, res, next) => {
     try {
+      
         const newUser = await UserService.createUser(req.body);
         res.status(201).send(newUser);
     } catch (err) {
-        res.status(500).json({ message: 'Fehler beim Erstellen des Benutzers' });
+        res.status(500).json({ message: 'Fehler beim Erstellen des Benutzers',Error: `name ${req.body.name} already exists. Please input a new one.`, });
         next(err);
     }
+
+    
 });
 
 /**

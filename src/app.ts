@@ -13,6 +13,7 @@ import {poiRouter} from "./routes/POI"
 
 
 import cors from 'cors';
+import { authenticationRoutes } from './routes/AuthenticationRoutes';
 
 const app = express();
 app.use(cors());
@@ -48,6 +49,7 @@ app.use("/api/user", userRouter);
 app.use('/api/poilist', poiListRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/poi", poiRouter);
+app.use("/api/authenticate", authenticationRoutes);
 
 
 export default app;

@@ -59,15 +59,13 @@ teamRouter.put("/:id", async (req, res, next) => {
     try {
         const teamId = req.params.id;
         const {playerID, action} = req.body;
-        console.log("action......",action)
+        
         if(action === "remove"){
             const updatedPlayerInTeam = await TeamService.updateDeletePlayerInTeam(teamId, req.body);
-            console.log("updatedPlayerInTeam DELETE Data......", updatedPlayerInTeam)
-            res.status(200).send(updatedPlayerInTeam);  
+            res.status(200).send(updatedPlayerInTeam); 
+
         }else{
-            const updatedTeam = await TeamService.updateTeam(teamId, req.body);
-            console.log("updatedTeam... Data......", updatedTeam)
-            
+            const updatedTeam = await TeamService.updateTeam(teamId, req.body); 
             res.status(200).send(updatedTeam);  
         }
          
@@ -77,9 +75,11 @@ teamRouter.put("/:id", async (req, res, next) => {
     }
 });
 
+/**
+ * get Team by codeInvite
+ */
 
 teamRouter.get("/:codeInvite", async (req: Request<{ codeInvite: string }>, res: Response, next: NextFunction): Promise<void> => {
-    console.log("QACode......",req.params.codeInvite)
     const codeInvite = req.params.codeInvite;
 
     try {
@@ -93,7 +93,7 @@ teamRouter.get("/:codeInvite", async (req: Request<{ codeInvite: string }>, res:
         const playerIDs = teams.flatMap(team => team.players).map(id => id.toString());
 
         // Hole alle Spieler-Daten auf einmal
-        const playersData = await Player.find({ _id: { $in: playerIDs } }).select("nickName gameId").lean();
+        const playersData = await Player.find({ _id: { $in: playerIDs } }).select("nickName").lean();
 
         // Spieler-Daten in die Map einfügen
         const playerDataMap = new Map<string, { nickName: string; host:boolean }>();
@@ -113,6 +113,8 @@ teamRouter.get("/:codeInvite", async (req: Request<{ codeInvite: string }>, res:
                 };
             }),
             codeInvite: team.codeInvite,
+            qaCode: team.qaCode,
+            shareUrl:team.shareUrl,
         }));
 
         // Return the teams found
@@ -120,6 +122,6 @@ teamRouter.get("/:codeInvite", async (req: Request<{ codeInvite: string }>, res:
     } catch (error) {
         console.error("Error fetching team data:", error);
         res.status(500).json({ message: "Error fetching team data." });
-        next(error);  // Pass the error to the next error handler if defined
+        next(error);  
     }
 });

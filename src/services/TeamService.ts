@@ -3,46 +3,66 @@ import { Team, ITeam } from '../model/TeamModel';
 import { TeamResource } from 'src/Resources';
 import { IPlayer, Player } from '../model/PlayerModel';
 import { generateQAcode } from '../utils/Qacodegenerate';
-const qaCode1 = generateQAcode();
+
 /**
  * Erstellt ein neues Team
  */
-export async function createTeam(teamResource: TeamResource, nameOfTeam:string): Promise<TeamResource> {
+export async function createTeam(teamResource: TeamResource, nameOfTeam: string): Promise<TeamResource> {
     try {
-        
+        // Überprüfe, ob der Spieler bereits einem Team zugeordnet ist
+        console.log("PlayerID", teamResource.playersID);
         const playerID = teamResource.playersID[0];
-        console.log("teamResourscccccc.......", teamResource);
         const existingTeam = await Team.findOne({ players: playerID }).exec();
-        let codeInvite;
-        
+
+        let uniqueCode: string;
+        let qrCodeDataUrl: string;
+        let shareUrl:string;
+
         if (existingTeam) {
-            codeInvite = existingTeam.codeInvite;
-        
+            // Wenn das Team bereits existiert, verwende dessen Einladungscode
+            uniqueCode = existingTeam.codeInvite;
+            qrCodeDataUrl = existingTeam.qaCode || ''; // Falls vorhanden
+            shareUrl = existingTeam.shareUrl || '';
         } else {
-            // Andernfalls neuen `qaCode` generieren
-            codeInvite = generateQAcode();
-        } 
-      
+            // Generiere neuen Einladungscode und QR-Code
+            const qaCode = await generateQAcode();
+            if (typeof qaCode === 'object' && qaCode !== null  ) {
+                uniqueCode = qaCode.uniqueCode;
+                qrCodeDataUrl = qaCode.qrCodeDataUrl;
+                shareUrl = qaCode.shareUrl;
+            } else {
+                throw new Error("Ungültige Antwort von generateQAcode");
+            }
+        }
+
+        // Erstelle ein neues Team-Dokument
         const team = new Team({
             name: nameOfTeam,
             players: teamResource.playersID.map(playerId => new Types.ObjectId(playerId)),
-            codeInvite: codeInvite,
+            codeInvite: uniqueCode,
+            qaCode: qrCodeDataUrl,
+            shareUrl: shareUrl,
         });
-       
-       const savedTeam = await team.save() as ITeam & { _id: Types.ObjectId }; // Typen des gespeicherten Dokuments anpassen
-       //const savedTeam = await team.save() as ITeam;
-       console.log("savedTeam.qaCode.......",savedTeam.codeInvite);
+
+        // Speichere das Team in der Datenbank
+        const savedTeam = await team.save() as ITeam & { _id: Types.ObjectId };
+
+        // Gib das gespeicherte Team als Antwort zurück
         return {
-            id: savedTeam.id.toString(), // ID als String
+            id: savedTeam.id.toString(),
             name: savedTeam.name,
-            poiId: savedTeam.poiId.map(poiId=> poiId.toString() ),
+            poiId: savedTeam.poiId.map(poiId => poiId.toString()),
             playersID: savedTeam.players.map(playerId => playerId.toString()),
-            codeInvite:savedTeam.codeInvite,
+            codeInvite: savedTeam.codeInvite,
+            qaCode: savedTeam.qaCode,
+            shareUrl: savedTeam.shareUrl,
         };
     } catch (error) {
+        console.error("Fehler beim Erstellen des Teams:", error);
         throw new Error("Fehler beim Erstellen des Teams");
     }
 }
+
 /**
  * Löscht ein Team anhand der ID
  */
@@ -96,7 +116,6 @@ export async function updateTeam(teamId: string, updatedData: any): Promise<any>
 
 export async function updateDeletePlayerInTeam(teamId: string, updatedData: { playerID: string, action: string }): Promise<any> {
     try {
-        // Find the team by ID
         const team = await Team.findById(teamId).exec();
 
         if (!team) {
@@ -105,10 +124,9 @@ export async function updateDeletePlayerInTeam(teamId: string, updatedData: { pl
 
         // Check action type
         if (updatedData.action === "remove") {
-            // Remove the playerID from the players array
             team.players = team.players.filter(id => id.toString() !== updatedData.playerID);
+        
         } else if (updatedData.action === "add") {
-            // Add the playerID to the players array if not already present
             if (!team.players.some(id => id.toString() === updatedData.playerID)) {
                 team.players.push(new mongoose.Types.ObjectId(updatedData.playerID)); // Ensure it's stored as ObjectId
             }
@@ -116,7 +134,6 @@ export async function updateDeletePlayerInTeam(teamId: string, updatedData: { pl
             throw new Error("Ungültige Aktion");
         }
 
-        // Save the updated team document
         const updatedTeam = await team.save();
 
         return updatedTeam;
@@ -129,9 +146,7 @@ export async function updateDeletePlayerInTeam(teamId: string, updatedData: { pl
 
 export async function getTeamsByQACode(codeInvite: string): Promise<any[]> {
     try {
-      
         const teams = await Team.find({ codeInvite: codeInvite });
-
         return teams;
         
     } catch (error) {
