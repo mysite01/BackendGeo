@@ -79,49 +79,44 @@ teamRouter.put("/:id", async (req, res, next) => {
  * get Team by codeInvite
  */
 
-teamRouter.get("/:codeInvite", async (req: Request<{ codeInvite: string }>, res: Response, next: NextFunction): Promise<void> => {
-    const codeInvite = req.params.codeInvite;
-
-    try {
-        // Call the service function
+teamRouter.get("/:codeInvite",async (req: Request<{ codeInvite: string }>, res: Response, next: NextFunction): Promise<void> => {
+      const codeInvite = req.params.codeInvite;
+  
+      try {
         const teams: ITeam[] = await TeamService.getTeamsByQACode(codeInvite);
-
-        if (teams.length === 0) {
-           res.status(404).json({ message: "No teams found for this QACode." });
-        }
-
+  
         const playerIDs = teams.flatMap(team => team.players).map(id => id.toString());
-
+  
         // Hole alle Spieler-Daten auf einmal
         const playersData = await Player.find({ _id: { $in: playerIDs } }).select("nickName").lean();
-
+  
         // Spieler-Daten in die Map einfügen
         const playerDataMap = new Map<string, { nickName: string; host:boolean }>();
         playersData.forEach(player => {
                 playerDataMap.set(player._id.toString(), { nickName: player.nickName, host:player.host });
         });
 
-        // Erzeuge das neue Team-Array mit den Spieler-Details
+          // Erzeuge das neue Team-Array mit den Spieler-Details
         const newTeams = teams.map(team => ({
-            _id: team._id,
-            name: team.name,
-            players: team.players.map(playerId => {
-                const playerData = playerDataMap.get(playerId.toString());
-                return {
-                    id: playerId.toString(),
-                    nickName: playerData ? playerData.nickName : 'Unbekannter Spieler',
-                };
-            }),
-            codeInvite: team.codeInvite,
-            qaCode: team.qaCode,
-            shareUrl:team.shareUrl,
+          _id: team._id,
+          name: team.name,
+          players: team.players.map(playerId => {
+            const playerData = playerDataMap.get(playerId.toString());
+            return {
+              id: playerId.toString(),
+              nickName: playerData ? playerData.nickName : 'Unbekannter Spieler',
+            };
+          }),
+          codeInvite: team.codeInvite,
+          qaCode: team.qaCode,
+          shareUrl:team.shareUrl,
         }));
-
+  
         // Return the teams found
         res.status(200).json(newTeams);
-    } catch (error) {
+      } catch (error) {
         console.error("Error fetching team data:", error);
         res.status(500).json({ message: "Error fetching team data." });
         next(error);  
-    }
+      }
 });
