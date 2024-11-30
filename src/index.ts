@@ -62,7 +62,7 @@ async function setup() {
     console.info(`Connecting to MongoDB at ${mongodURI}`);
     await mongoose.connect(mongodURI);
 
-    await createExampleGame;
+    await createExampleGame();
 
     const httpPort = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3443;
     const httpServer = http.createServer(app);
