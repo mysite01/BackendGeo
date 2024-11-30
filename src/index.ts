@@ -9,6 +9,8 @@ import { GameResource, POIResource } from "src/Resources";
 import { Types } from "mongoose";
 import * as GameService from "./services/GameService";
 import * as POIService from "./services/POIService"
+import { WebSocketServer, WebSocket } from 'ws';
+
 
 
 async function createExampleGame() {
@@ -28,14 +30,23 @@ async function createExampleGame() {
     await GameService.createGame(gameData)
 }
 
+const clients: Set<WebSocket> = new Set();
+
+function broadcast(data: any) {
+    const jsonData = JSON.stringify(data);
+    clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(jsonData);
+        }
+    });
+}
+
 async function setup() {
-   // let mongodURI = process.env.DB_CONNECTION_STRING;
-   console.log("USE_SSL:", process.env.USE_SSL);
-   console.log("HTTP_PORT:", process.env.HTTP_PORT);
-   console.log("JWT_SECRET:", process.env.JWT_SECRET);
-   //console.log("DB_CONNECTION_STRING:", process.env.DB_CONNECTION_STRING);
-   
-      let mongodURI = "memory"
+    console.log("USE_SSL:", process.env.USE_SSL);
+    console.log("HTTP_PORT:", process.env.HTTP_PORT);
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
+    let mongodURI = "memory"
     if (!mongodURI) {
         console.error(`Cannot start`);
         process.exit(1);
@@ -51,10 +62,53 @@ async function setup() {
     console.info(`Connecting to MongoDB at ${mongodURI}`);
     await mongoose.connect(mongodURI);
 
-    await createExampleGame(); 
+    await createExampleGame();
 
     const httpPort = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3443;
     const httpServer = http.createServer(app);
+
+    const wss = new WebSocketServer({ server: httpServer });
+
+    wss.on("connection", (ws: WebSocket) => {
+        console.info("Ein neuer Client hat sich verbunden.");
+        clients.add(ws);
+      
+        ws.on("message", (message) => {
+          try {
+            console.info(`Nachricht empfangen: ${message}`);
+            const data = JSON.parse(message.toString());
+            console.info("Parsed message:", data); // Debugging-Ausgabe
+      
+            if (data.type === "join") {
+              console.info(`${data.playerName} ist Team ${data.teamId} beigetreten.`);
+              broadcast({
+                type: "join",
+                playerId: data.playerId,
+                playerName: data.playerName,
+                teamId: data.teamId,
+              });
+            } else if (data.type === "leave") {
+              console.info(`${data.playerName} hat Team ${data.teamId} verlassen.`);
+              broadcast({
+                type: "leave",
+                playerId: data.playerId,
+                playerName: data.playerName,
+                teamId: data.teamId,
+              });
+            }
+          } catch (error) {
+            console.error("Fehler beim Verarbeiten der Nachricht:", error);
+          }
+        });
+      
+        ws.on("close", () => {
+          console.info("Ein Client hat die Verbindung geschlossen.");
+          clients.delete(ws);
+        });
+      });
+      
+
+    
 
     function startHttpServer() {
         httpServer.listen(httpPort, () => {
