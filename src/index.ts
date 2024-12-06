@@ -95,6 +95,10 @@ async function setup() {
                 playerName: data.playerName,
                 teamId: data.teamId,
               });
+            } else if (data.type === "loadMap") {
+              broadcast({
+                type: "loadMap",
+              });
             }
           } catch (error) {
             console.error("Fehler beim Verarbeiten der Nachricht:", error);

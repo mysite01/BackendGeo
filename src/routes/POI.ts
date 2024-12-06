@@ -1,5 +1,6 @@
 import express from "express";
 import { createPOI, deletePOI, getAllPOIs, getPOIById } from "../services/POIService";
+import { getTeam, updateTeamPOIs } from "../services/TeamService";
 
 export const poiRouter = express.Router();
 
@@ -64,5 +65,34 @@ poiRouter.get("/", async (req, res, next) => {
         next(err);
     }
 });
+
+
+poiRouter.post("/claim/:id", async (req, res, next) => {
+    let id = ""
+    let teamId
+    if (req.params) {
+        id = req.params.id;
+    }
+    if(req.body) {
+        teamId = req.body.teamId;
+    }
+
+    try {
+        const poi = await getPOIById(id);
+        const team = await getTeam(teamId)
+
+        if (!team.poiId.includes(id)) {
+            team.poiId.push(id); 
+            await updateTeamPOIs(teamId, { poiId: team.poiId }); 
+        }
+
+        res.status(200).json({ message: "POI claimed successfully", team });
+    } catch (err) {
+        res.status(404); 
+        next(err);
+    }
+});
+
+
 
 export default poiRouter;

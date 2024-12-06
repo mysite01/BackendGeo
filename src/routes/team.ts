@@ -51,6 +51,17 @@ teamRouter.delete("/:id", async (req, res, next) => {
 })
 
 
+teamRouter.get("/team/:id", async (req,res, next)=>{
+  try {
+    const teamId = req.params.id;
+    const pois = await TeamService.getTeam(teamId);
+    res.status(200).send(pois); 
+} catch (err) {
+    res.status(500); 
+    next(err);
+}
+})
+
 
 /**
  * Route update Team

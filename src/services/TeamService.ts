@@ -3,7 +3,7 @@ import { Team, ITeam } from '../model/TeamModel';
 import { TeamResource } from 'src/Resources';
 import { IPlayer, Player } from '../model/PlayerModel';
 import { generateQAcode } from '../utils/Qacodegenerate';
-
+import { ObjectId } from "mongodb";
 /**
  * Erstellt ein neues Team
  */
@@ -113,6 +113,34 @@ export async function updateTeam(teamId: string, updatedData: any): Promise<any>
     }
 }
 
+/**
+ * Update POIs in a team based on the team ID
+ */
+export async function updateTeamPOIs(teamId: string, updatedPOIs: { poiId: string[] }): Promise<any> {
+    try {
+        const team = await Team.findById(teamId).exec();
+
+        if (!team) {
+            throw new Error("Team nicht gefunden");
+        }
+
+        const currentPOIs = team.poiId.map(poi => poi instanceof ObjectId ? poi : new ObjectId(poi));
+        const updatedPOIsIds = updatedPOIs.poiId.map(poi => ObjectId.isValid(poi) ? new ObjectId(poi) : new ObjectId(poi));
+
+        const uniquePOIs = Array.from(new Set([...currentPOIs, ...updatedPOIsIds]));
+
+        team.poiId = uniquePOIs;
+
+        const updatedTeam = await team.save();
+        
+        
+        return updatedTeam;
+
+    } catch (error) {
+        throw new Error("Fehler beim Update der POIs im Team");
+    }
+}
+
 
 export async function updateDeletePlayerInTeam(teamId: string, updatedData: { playerID: string, action: string }): Promise<any> {
     try {
@@ -153,4 +181,21 @@ export async function getTeamsByQACode(codeInvite: string): Promise<any[]> {
         console.error("Error in getTeamsByQACode:", error);
         throw error;
     }
+}
+
+
+export async function getTeam(id: string): Promise<TeamResource> {
+    const team = await Team.findById(id).exec();
+    if (!team) {
+        throw new Error(`Team mit der ID ${id} wurde nicht gefunden.`);
+    }
+    return {
+        id: team.id.toString(),
+        name: team.name,
+        poiId: team.poiId.map(poiId => poiId.toString()),
+        playersID: team.players.map(playerId => playerId.toString()),
+        codeInvite: team.codeInvite,
+        qaCode: team.qaCode,
+        shareUrl: team.shareUrl,
+    };
 }
