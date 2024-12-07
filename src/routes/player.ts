@@ -1,6 +1,7 @@
 import express, {Request} from "express";
 import * as PlayerService from "../services/PlayerService"
 import { PlayerResource } from "src/Resources";
+import * as TeamService from "../services/TeamService"
 
 //TODO: mit ExpressValidator Input validieren
 
@@ -64,7 +65,7 @@ playerRouter.get("/:id", async (req, res, next) =>{
 playerRouter.put("/:id", async (req, res, next) => {
     try {
         const playerId = req.params.id;
-        const {playerID, action} = req.body;
+        const {teamId, action} = req.body;
 
         if(action === "remove"){
             const updatedTeamIDInPlayer = await PlayerService.updateDeletePlayerInTeam(playerId, req.body);

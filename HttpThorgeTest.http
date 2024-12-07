@@ -33,3 +33,7 @@ POST http://localhost:3443/api/poi/claim/6753143deca1fd6536d307cd
 
 ###
 GET http://127.0.0.1:3443/api/poi
+
+###
+
+GET http://localhost:3443/api/team/team/67543721d6e1c73493d013d7

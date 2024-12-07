@@ -7,7 +7,6 @@ export interface IPlayer {
     leftAtInTeam?: Date;
     host:boolean;
     teamId?: mongoose.Types.ObjectId;
-    
 }
 
 const playerSchema = new mongoose.Schema<IPlayer>(

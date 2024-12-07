@@ -7,22 +7,20 @@ import { ObjectId } from "mongodb";
 /**
  * Erstellt ein neues Team
  */
-export async function createTeam(teamResource: TeamResource, nameOfTeam: string): Promise<TeamResource> {
+export async function createTeam(teamResource: TeamResource, nameOfTeam: string, codeInvite?: string): Promise<TeamResource> {
     try {
-        // Überprüfe, ob der Spieler bereits einem Team zugeordnet ist
-        console.log("PlayerID", teamResource.playersID);
-        const playerID = teamResource.playersID[0];
-        const existingTeam = await Team.findOne({ players: playerID }).exec();
 
-        let uniqueCode: string;
-        let qrCodeDataUrl: string;
-        let shareUrl:string;
+        let uniqueCode: string = "";
+        let qrCodeDataUrl: string = "";
+        let shareUrl: string = "";
 
-        if (existingTeam) {
-            // Wenn das Team bereits existiert, verwende dessen Einladungscode
-            uniqueCode = existingTeam.codeInvite;
-            qrCodeDataUrl = existingTeam.qaCode || ''; // Falls vorhanden
-            shareUrl = existingTeam.shareUrl || '';
+        if (codeInvite) {
+            const existingTeam = await Team.findOne({codeInvite: codeInvite})
+            if(existingTeam){
+                qrCodeDataUrl = existingTeam.qaCode
+                shareUrl = existingTeam.shareUrl || '';
+                uniqueCode = codeInvite;
+            }
         } else {
             // Generiere neuen Einladungscode und QR-Code
             const qaCode = await generateQAcode();
@@ -124,22 +122,24 @@ export async function updateTeamPOIs(teamId: string, updatedPOIs: { poiId: strin
             throw new Error("Team nicht gefunden");
         }
 
-        const currentPOIs = team.poiId.map(poi => poi instanceof ObjectId ? poi : new ObjectId(poi));
-        const updatedPOIsIds = updatedPOIs.poiId.map(poi => ObjectId.isValid(poi) ? new ObjectId(poi) : new ObjectId(poi));
+        // Convert current and updated POIs to strings for comparison
+        const currentPOIs = team.poiId.map(poi => poi.toString());
+        const updatedPOIsIds = updatedPOIs.poiId.map(poi => new ObjectId(poi).toString());
 
+        // Merge and deduplicate by string representation
         const uniquePOIs = Array.from(new Set([...currentPOIs, ...updatedPOIsIds]));
 
-        team.poiId = uniquePOIs;
+        // Convert back to ObjectId for MongoDB
+        team.poiId = uniquePOIs.map(poi => new ObjectId(poi));
 
         const updatedTeam = await team.save();
-        
-        
-        return updatedTeam;
 
+        return updatedTeam;
     } catch (error) {
-        throw new Error("Fehler beim Update der POIs im Team");
+        throw new Error(`Fehler beim Update der POIs im Team: ${error}`);
     }
 }
+
 
 
 export async function updateDeletePlayerInTeam(teamId: string, updatedData: { playerID: string, action: string }): Promise<any> {
@@ -189,6 +189,26 @@ export async function getTeam(id: string): Promise<TeamResource> {
     if (!team) {
         throw new Error(`Team mit der ID ${id} wurde nicht gefunden.`);
     }
+    return {
+        id: team.id.toString(),
+        name: team.name,
+        poiId: team.poiId.map(poiId => poiId.toString()),
+        playersID: team.players.map(playerId => playerId.toString()),
+        codeInvite: team.codeInvite,
+        qaCode: team.qaCode,
+        shareUrl: team.shareUrl,
+    };
+}
+
+export async function getTeamByPlayerId(id: string): Promise<TeamResource> {
+
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    const team = await Team.findOne({ players: objectId }).exec();
+    if (!team) {
+      throw new Error(`Team für den Spieler mit der ID ${id} wurde nicht gefunden.`);
+    }
+
     return {
         id: team.id.toString(),
         name: team.name,

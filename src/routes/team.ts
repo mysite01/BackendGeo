@@ -19,12 +19,17 @@ export const teamRouter = express.Router();
  * 
  */
 teamRouter.post("/", async (req, res, next) =>{
-    console.log("name nickName.......",req.body);
+    //console.log("name nickName.......",req.body);
     const nameofTeam = req.body.nameOfTeam;
 
     try{
-        const createNewTeam = await TeamService.createTeam(req.body, nameofTeam)
-        res.status(201).send(createNewTeam)
+      let newTeam
+        if(req.body.codeInvite){
+          newTeam = await TeamService.createTeam(req.body, nameofTeam, req.body.codeInvite)
+        } else {
+          newTeam = await TeamService.createTeam(req.body, nameofTeam)
+        }
+        res.status(201).send(newTeam)
         
     } catch (err){
         res.status(404)
@@ -95,7 +100,7 @@ teamRouter.get("/:codeInvite",async (req: Request<{ codeInvite: string }>, res: 
   
       try {
         const teams: ITeam[] = await TeamService.getTeamsByQACode(codeInvite);
-  
+        console.log(teams)
         const playerIDs = teams.flatMap(team => team.players).map(id => id.toString());
   
         // Hole alle Spieler-Daten auf einmal

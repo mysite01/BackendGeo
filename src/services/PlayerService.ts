@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { PlayerResource } from "../../src/Resources";
+import { PlayerResource, TeamResource } from "../../src/Resources";
 import { IPlayer, Player } from "../model/PlayerModel";
-
+import { Team } from "../model/TeamModel";
 
 /**
  * gibt alle Spieler aus einem bestimmten Game als
@@ -123,7 +123,7 @@ export async function updateDeletePlayerInTeam(
 }
 
 /**
- * update teamid in player
+ * update teamid in player & playerId in Team
  */
 export async function updatePlayer(playerID: string, updatedData: Partial<IPlayer>): Promise<IPlayer | null> {
     try {
@@ -135,11 +135,24 @@ export async function updatePlayer(playerID: string, updatedData: Partial<IPlaye
             { new: true }      
         ).exec();
 
+        const teamId = new mongoose.Types.ObjectId(updatedData.teamId)
+        const team = await Team.findOne(teamId)
+        let players = team?.players
+        let playerId = new mongoose.Types.ObjectId(playerID)
+        if(!players?.includes(playerId)){
+            players?.push(playerId)
+        }
+        const updatedTeam = await Team.findOneAndUpdate(
+            {_id: teamId},
+            {$set: {players: players}},
+            {new: true}
+        )
+
         if (!updatedPlayer) {
             throw new Error("Spieler nicht gefunden");
         }
 
-        console.log("Aktualisierter Spieler:", updatedPlayer);
+        //console.log("Aktualisierter Spieler:", updatedPlayer);
         return updatedPlayer;
     } catch (error) {
         if (error instanceof Error) {

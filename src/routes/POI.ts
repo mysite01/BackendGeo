@@ -1,6 +1,6 @@
 import express from "express";
 import { createPOI, deletePOI, getAllPOIs, getPOIById } from "../services/POIService";
-import { getTeam, updateTeamPOIs } from "../services/TeamService";
+import { getTeamByPlayerId, updateTeamPOIs } from "../services/TeamService";
 
 export const poiRouter = express.Router();
 
@@ -69,20 +69,21 @@ poiRouter.get("/", async (req, res, next) => {
 
 poiRouter.post("/claim/:id", async (req, res, next) => {
     let id = ""
-    let teamId
+    let teams
+    let player
     if (req.params) {
         id = req.params.id;
     }
     if(req.body) {
-        teamId = req.body.teamId;
+        teams = req.body.teamIds;
+        player = req.body.playerId;
     }
 
     try {
-        const poi = await getPOIById(id);
-        const team = await getTeam(teamId)
-
-        if (!team.poiId.includes(id)) {
-            team.poiId.push(id); 
+        const team = await getTeamByPlayerId(player)
+        const teamId = team.id;
+        if (!team.poiId.includes(id) && teamId) {
+            team.poiId = [...new Set([...team.poiId, id])];
             await updateTeamPOIs(teamId, { poiId: team.poiId }); 
         }
 

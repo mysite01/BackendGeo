@@ -98,6 +98,12 @@ async function setup() {
             } else if (data.type === "loadMap") {
               broadcast({
                 type: "loadMap",
+                dataGameInstance: data.dataGameInstance,
+                teamID: data.teamID
+              });
+            }else if (data.type === "loadGame") {
+              broadcast({
+                type: "loadGame",
               });
             }
           } catch (error) {
