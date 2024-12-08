@@ -85,9 +85,10 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
         if (!team.poiId.includes(id) && teamId) {
             team.poiId = [...new Set([...team.poiId, id])];
             await updateTeamPOIs(teamId, { poiId: team.poiId }); 
+            res.status(200).json({ message: "POI claimed successfully", team });
+        } else {
+            res.status(300).json({message: "POI already claimed"})
         }
-
-        res.status(200).json({ message: "POI claimed successfully", team });
     } catch (err) {
         res.status(404); 
         next(err);
