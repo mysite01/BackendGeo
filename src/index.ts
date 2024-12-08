@@ -14,16 +14,38 @@ import { WebSocketServer, WebSocket } from 'ws';
 
 
 async function createExampleGame() {
-    const poi1: POIResource = { name: "Point", lat: 52.520008, long: 13.404954, beschreibung: "Alexanderplatz", punkte: 100}
-    const poi2: POIResource = { name: "Point", lat: 52.516275, long: 13.377704, beschreibung: "Brandenburger Tor", punkte: 100}
+    const poi1: POIResource = { name: "Alexanderplatz", lat: 52.520008, long: 13.404954, beschreibung: "Ein belebter Platz mit Fernsehturm, Geschäften und urbanem Flair.", punkte: 100}
+    const poi2: POIResource = { name: "Brandenburger Tor", lat: 52.516275, long: 13.377704, beschreibung: "Ein ikonisches Monument und Symbol für Geschichte und Einheit.", punkte: 200}
+    const poi3: POIResource = { name: "Podsdamer Platz", lat: 52.509290, long: 13.376340, beschreibung: "Ein moderner Knotenpunkt mit Architektur, Kultur und Unterhaltung.", punkte: 100}
+    const poi4: POIResource = { name: "Oberbaumbrücke", lat: 52.501834, long: 13.445656, beschreibung: "Eine markante Brücke mit Doppeldeck-Architektur und historischem Charme.", punkte: 100}
+    const poi5: POIResource = { name: "Museumsinsel", lat: 52.516260, long: 13.402480, beschreibung: "Ein einzigartiges Kulturensemble mit weltberühmten Museen.", punkte: 100}
+    const poi6: POIResource = { name: "Volkspark Friedrichhain", lat: 52.528730, long: 13.442284, beschreibung: "Ein weitläufiger Park mit grünen Wiesen, Hügeln und Entspannungsoasen.", punkte: 50}
+    const poi7: POIResource = { name: "Deutsches Technikmuseum", lat: 52.498603, long: 13.378154, beschreibung: "Ein faszinierendes Museum mit historischen Exponaten zu Technik und Ingenieurskunst.", punkte: 50}
+    const poi8: POIResource = { name: "Checkpoint Charlie", lat: 52.507530, long: 13.390378, beschreibung: "Ein historischer Grenzpunkt und Symbol des Kalten Krieges.", punkte: 200}
+   
 
     const poi1FullData = await POIService.createPOI(poi1)
     const poi2FullData = await POIService.createPOI(poi2)
+    const poi3FullData = await POIService.createPOI(poi3)
+    const poi4FullData = await POIService.createPOI(poi4)
+    const poi5FullData = await POIService.createPOI(poi5)
+    const poi6FullData = await POIService.createPOI(poi6)
+    const poi7FullData = await POIService.createPOI(poi7)
+    const poi8FullData = await POIService.createPOI(poi8)
 
     const gameData: GameResource = {
         title: "Berlin Sehenswürdigkeiten",
         beschreibung: "Einige der bekanntesten Sehenswürdigkeiten in Berlin",
-        poilId: [poi1FullData.id!, poi2FullData.id!],
+        poilId: [
+          poi1FullData.id!,
+          poi2FullData.id!,
+          poi3FullData.id!,
+          poi4FullData.id!,
+          poi5FullData.id!,
+          poi6FullData.id!,
+          poi7FullData.id!,
+          poi8FullData.id!,
+        ],
         maxTeam: 5,
         userId: new Types.ObjectId().toString(),
     };
