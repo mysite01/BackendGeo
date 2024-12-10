@@ -5,10 +5,9 @@ export async function generateQAcode(): Promise<{ qrCodeDataUrl: string, uniqueC
     
     try {
         const uniqueCode = generateUniqueCode(); // Eindeutiger Code
-        //console.log(`${process.env.FRONTEND_URL}`)
-        const inviteUrl = `${process.env.FRONTEND_URL}/ReadQACode/${uniqueCode}`; // Einladung-URL 
+        const inviteUrl = `${process.env.CORS_ORIGIN}/ReadQACode/${uniqueCode}`; // Einladung-URL 
 
-        const shareUrl = `${process.env.FRONTEND_URL}/${uniqueCode}?feature=shared`;
+        const shareUrl = `${process.env.CORS_ORIGIN}/${uniqueCode}?feature=shared`;
         // QR-Code aus der URL generieren
         const qrCodeDataUrl = await QRCode.toDataURL(inviteUrl);
         //console.log("QR-Code erfolgreich generiert:", inviteUrl);
