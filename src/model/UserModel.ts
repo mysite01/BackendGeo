@@ -5,6 +5,10 @@ export interface IUser {
     name: string;
     password: string;
     createdAt: Date;
+    email?: string; // Optionale E-Mail-Adresse
+    emailConfirmed?: boolean; // Status der E-Mail-Bestätigung
+    resetToken?: string; // Token für Passwort-Zurücksetzen
+    resetTokenExpiration?: Date; // Ablaufzeitpunkt des Reset-Tokens
 }
 
 interface IUserMethods {
@@ -16,6 +20,10 @@ type UserModel = Model<IUser, {}, IUserMethods>;
 const UserSchema = new Schema<IUser, UserModel, IUserMethods>({
     name: { type: String, required: true },
     password: { type: String, required: true },
+    email: { type: String, required: false }, // Optionales Feld für die E-Mail
+    emailConfirmed: { type: Boolean, default: false }, // Standard: Nicht bestätigt
+    resetToken: { type: String, required: false }, // Token für Passwort-Zurücksetzen
+    resetTokenExpiration: { type: Date, required: false }, // Ablaufzeit des Tokens
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -33,3 +41,4 @@ UserSchema.method("isCorrectPassword", async function (candidatePassword: string
 });
 
 export const User = model<IUser, UserModel>("User", UserSchema);
+

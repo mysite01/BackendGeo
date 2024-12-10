@@ -19,9 +19,13 @@ authenticationRoutes.post("/login", async (req, res,next) => {
         }
     } catch (error) {
         // Fehlerbehandlung
-         res.status(500).json({ message: 'Serverfehler', error });
-    }
+        if (error instanceof Error) {
+            res.status(500).json(error.message);
 
+          } else {
+            res.status(500).json(error);
+          }
+    }  
 })
     
 

@@ -1,34 +1,47 @@
 import { User } from "../model/UserModel";
 import jwt from "jsonwebtoken";
+import { verifyJWT } from "./JWTService";
 
 /**
  * Prüft Name und Passwort. Bei Erfolg wird die Benutzer-ID und ein JWT zurückgegeben.
  */
-export async function login(name: string, password: string): Promise<{ id: string; token: string } | false> {
+
+export async function login(name: string, password: string): Promise<{ id: string; token: string }> {
+    // Benutzer suchen
     const user = await User.findOne({ name }).exec();
 
-    if (user && await user.isCorrectPassword(password)) {
-
-        const secret = process.env.JWT_SECRET;
-        if (!secret) {
-            throw new Error("Umgebungsvariable JWT_SECRET ist nicht gesetzt.");
-        }
-        const expiresIn = "1h"; // Token läuft nach 1 Stunde ab
-        const token = jwt.sign(
-            { id: user._id.toString(),
-                name:user.name,
-             }, // Payload
-            secret,
-            { expiresIn }
-        );
-
-        return {
-            id: user._id.toString(),
-            token,
-        };
+    // Fehlerbehandlung: Benutzer nicht gefunden
+    if (!user) {
+        throw new Error('User not found');
     }
 
-    return false; // Login fehlgeschlagen
+    // Passwortvalidierung
+    const isCorrectPassword = await user.isCorrectPassword(password);
+    if (!isCorrectPassword) {
+        throw new Error('Invalid password');
+    }
+
+    // Token-Erstellung
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error("Umgebungsvariable JWT_SECRET ist nicht gesetzt.");
+    }
+
+    const token = jwt.sign(
+        {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+        }, // Payload
+        secret,
+        { expiresIn: "1h" } // Ablaufzeit des Tokens
+    );
+
+    // Erfolgreiches Login: Token und ID zurückgeben
+    return {
+        id: user._id.toString(),
+        token,
+    };
 }
 
 /**
@@ -54,3 +67,15 @@ export async function register(name: string, password: string): Promise<{ id: st
         id: savedUser._id.toString(),
     };
 }
+
+export async function authenticateToken(token: string): Promise<{ id: string }> {
+    try {
+        const decoded = verifyJWT(token); // Verifiziert das Token
+        return { id: decoded.id 
+            
+        };
+    } catch (error) {
+        throw new Error("Ungültiges oder abgelaufenes Token.");
+    }
+}
+    
