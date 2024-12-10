@@ -36,14 +36,25 @@ export async function getPlayer(id:string): Promise<PlayerResource> {
     if (!player) {
         throw new Error(`Player mit ID ${id} nicht gefunden`);
     }
-
-    const playerResource: PlayerResource = {
-        id: player._id.toString(),
-        nickName: player.nickName,
-        teamId: "1234",
-        createdAt: player.createdAt ? player.createdAt.toISOString() : new Date().toISOString(),
-        host:player.host, 
-    };
+    let team = player.teamId
+    let playerResource: PlayerResource
+    if(team){
+        playerResource = {
+            id: player._id.toString(),
+            nickName: player.nickName,
+            teamId: team.toString(),
+            createdAt: player.createdAt ? player.createdAt.toISOString() : new Date().toISOString(),
+            host:player.host, 
+        };
+    } else {
+        playerResource = {
+            id: player._id.toString(),
+            nickName: player.nickName,
+            teamId: "",
+            createdAt: player.createdAt ? player.createdAt.toISOString() : new Date().toISOString(),
+            host:player.host, 
+        };
+    }
 
     return playerResource;
 }
@@ -65,7 +76,7 @@ export async function createPlayer(playerResource: PlayerResource):Promise<Playe
         id: gespeicherterSpieler._id.toString(), 
         nickName: gespeicherterSpieler.nickName,  
         host:gespeicherterSpieler.host, 
-        teamId: "12345",
+        teamId: "",
         createdAt: gespeicherterSpieler.createdAt ? gespeicherterSpieler.createdAt.toISOString() : new Date().toISOString(), 
         
     };

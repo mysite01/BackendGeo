@@ -68,24 +68,38 @@ poiRouter.get("/", async (req, res, next) => {
 
 
 poiRouter.post("/claim/:id", async (req, res, next) => {
+
+    const maxPOIClaimDistance = 50; //meter
+
     let id = ""
     let teams
     let player
+    let positionPlayer
     if (req.params) {
         id = req.params.id;
     }
     if(req.body) {
         teams = req.body.teamIds;
         player = req.body.playerId;
+        positionPlayer = req.body.positionPlayer;
     }
 
     try {
+        const poi = await getPOIById(id);
+        //console.log(`POI Latitude: ${poi.lat}, Player Latitude: ${positionPlayer.lat}, POI Longitude: ${poi.long}, Player Longitude: ${positionPlayer.lng}`);
+        const distance = calculateDistance(poi.lat, poi.long, positionPlayer.lat, positionPlayer.lng)
+        //console.log(distance)
         const team = await getTeamByPlayerId(player)
         const teamId = team.id;
+
         if (!team.poiId.includes(id) && teamId) {
-            team.poiId = [...new Set([...team.poiId, id])];
-            await updateTeamPOIs(teamId, { poiId: team.poiId }); 
-            res.status(200).json({ message: "POI claimed successfully", team });
+            if(distance < maxPOIClaimDistance){
+                team.poiId = [...new Set([...team.poiId, id])];
+                await updateTeamPOIs(teamId, { poiId: team.poiId }); 
+                res.status(200).json({ message: "POI claimed successfully", team });
+            } else {
+                res.status(300).json({message: `To far away. Current Distance: ${Math.round(distance)} meters`})
+            }
         } else {
             res.status(300).json({message: "POI already claimed"})
         }
@@ -94,6 +108,25 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
         next(err);
     }
 });
+
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const toRadians = (degree: number): number => (degree * Math.PI) / 180;
+
+    const R = 6371e3; 
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; 
+
+    return distance;
+}
 
 
 
