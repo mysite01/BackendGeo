@@ -100,7 +100,7 @@ teamRouter.get("/:codeInvite",async (req: Request<{ codeInvite: string }>, res: 
   
       try {
         const teams: ITeam[] = await TeamService.getTeamsByQACode(codeInvite);
-        console.log(teams)
+        //console.log(teams)
         const playerIDs = teams.flatMap(team => team.players).map(id => id.toString());
   
         // Hole alle Spieler-Daten auf einmal
