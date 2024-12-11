@@ -98,7 +98,7 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
                 await updateTeamPOIs(teamId, { poiId: team.poiId }); 
                 res.status(200).json({ message: "POI claimed successfully", team });
             } else {
-                res.status(300).json({message: `To far away. Current Distance: ${Math.round(distance)} meters`})
+                res.status(300).json({message: `Too far away. Current Distance: ${Math.round(distance)} meters`})
             }
         } else {
             res.status(300).json({message: "POI already claimed"})
