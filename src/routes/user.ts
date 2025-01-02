@@ -59,3 +59,24 @@ userRouter.get("/:id", async (req, res, next) => {
         next(err);
     }
 });
+
+userRouter.post("/verify-email", async (req, res, next) => {
+    try {
+        const { token } = req.body;
+
+        // Verifizierung durchführen
+        const isVerified = await UserService.verifyEmail(token);
+
+        if (!isVerified) {
+            res.status(400).json({ message: "Ungültiger oder abgelaufener Token." });
+            return;
+        }
+
+        res.status(200).json({ message: "E-Mail erfolgreich bestätigt!" });
+    } catch (err) {
+        res.status(500).json({ 
+            message: "Fehler bei der E-Mail-Verifizierung."
+                });
+        next(err);
+    }
+});

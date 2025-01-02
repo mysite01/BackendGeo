@@ -1,6 +1,9 @@
 import mongoose, { Types } from 'mongoose';
 import { User, IUser } from '../model/UserModel';
 import { UserResource } from 'src/Resources';
+import crypto from "crypto";
+import nodemailer from "nodemailer";
+
 
 /**
  * Erstellt einen neuen Benutzer
@@ -12,13 +15,54 @@ export async function createUser(userResource: UserResource): Promise<UserResour
             throw new Error("Benutzername existiert bereits.");
         }
 
+        // Verifizierungstoken generieren
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+
         const user = new User({
             name: userResource.name,
-            password: userResource.password, // Passwort wird im Model gehasht
+            password: userResource.password,
             createdAt: new Date(),
+            email: userResource.email,
+            verificationToken,
+            emailConfirmed: false, // Noch nicht bestätigt
         });
 
         const savedUser = await user.save();
+
+        // Test-Account von Ethereal erstellen
+        const testAccount = await nodemailer.createTestAccount();
+        const transporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            secure: false, // Kein SSL
+            auth: {
+                user: testAccount.user,
+                pass: testAccount.pass,
+            },
+        });
+
+        // Verifizieren der Verbindung (optional, nur zum Debugging)
+        transporter.verify((error, success) => {
+            if (error) {
+                console.error("Fehler bei der SMTP-Verbindung:", error);
+            } else {
+                console.log("SMTP-Verbindung erfolgreich:", success);
+            }
+        });
+
+        const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
+        const mailResponse = await transporter.sendMail({
+            from: testAccount.user, // Absenderadresse
+            to: user.email, // Empfängeradresse
+            subject: "Bestätige deine E-Mail-Adresse",
+            html: `<p>Hallo ${user.name},</p>
+                   <p>Bitte bestätige deine E-Mail-Adresse, indem du auf den folgenden Link klickst:</p>
+                   <a href="${verificationUrl}">E-Mail bestätigen</a>
+                   <p>Der Link ist 24 Stunden gültig.</p>`,
+        });
+
+        console.log("E-Mail gesendet:", mailResponse.messageId);
+        console.log("Vorschau-URL:", nodemailer.getTestMessageUrl(mailResponse));
 
         return {
             id: savedUser._id.toString(),
@@ -84,3 +128,32 @@ export async function getUserByName(name: string): Promise<UserResource> {
 }
 
 
+/**
+ * Verifiziert die E-Mail-Adresse eines Benutzers anhand des Tokens.
+ */
+export async function verifyEmail(token: string): Promise<boolean> {
+    try {
+        // Benutzer anhand des Tokens finden
+        const user = await User.findOne({ verificationToken: token }).exec();
+
+        if (!user) {
+            throw new Error("Ungültiger Verifizierungstoken.");
+        }
+
+        // Ablaufdatum des Tokens prüfen (falls vorhanden)
+        if (user.verificationTokenExpiration && user.verificationTokenExpiration < new Date()) {
+            throw new Error("Verifizierungstoken ist abgelaufen.");
+        }
+
+        // Benutzer als verifiziert markieren
+        user.emailConfirmed = true;
+        user.verificationToken = null; // Token entfernen
+        user.verificationTokenExpiration = undefined; // Ablaufdatum entfernen
+        await user.save();
+
+        return true;
+    } catch (error: any) {
+        console.error("Fehler bei der E-Mail-Verifizierung:", error.message);
+        throw new Error(`Fehler bei der E-Mail-Verifizierung: ${error.message}`);
+    }
+}
