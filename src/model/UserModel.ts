@@ -9,6 +9,8 @@ export interface IUser {
     emailConfirmed?: boolean; // Status der E-Mail-Bestätigung
     resetToken?: string; // Token für Passwort-Zurücksetzen
     resetTokenExpiration?: Date; // Ablaufzeitpunkt des Reset-Tokens
+    verificationToken?: string | null; // Token für E-Mail-Verifizierung
+    verificationTokenExpiration?: Date; // Ablaufzeit für Verifizierungstoken
 }
 
 interface IUserMethods {
@@ -20,11 +22,13 @@ type UserModel = Model<IUser, {}, IUserMethods>;
 const UserSchema = new Schema<IUser, UserModel, IUserMethods>({
     name: { type: String, required: true },
     password: { type: String, required: true },
-    email: { type: String, required: false }, // Optionales Feld für die E-Mail
+    email: { type: String, required: true }, // Email als Pflichtfeld
     emailConfirmed: { type: Boolean, default: false }, // Standard: Nicht bestätigt
     resetToken: { type: String, required: false }, // Token für Passwort-Zurücksetzen
     resetTokenExpiration: { type: Date, required: false }, // Ablaufzeit des Tokens
-    createdAt: { type: Date, default: Date.now }
+    verificationToken: { type: String, default: null }, // Token für Verifizierung
+    createdAt: { type: Date, default: Date.now },
+    verificationTokenExpiration: { type: Date, required: false } // Ablaufzeit für Verifizierungstoken
 });
 
 // **Middleware: Passwort-Hashing vor dem Speichern**

@@ -47,6 +47,8 @@ export type UserResource = {
     name: string;
     password?: string;
     createdAt?: Date;
+    email?: string;
+    verificationToken?: string | null; // Token für E-Mail-Verifizierung
 };
 
 export type POIResource = {
