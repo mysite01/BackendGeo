@@ -15,6 +15,11 @@ export async function login(name: string, password: string): Promise<{ id: strin
         throw new Error('User not found');
     }
 
+    // Überprüfen, ob die E-Mail-Adresse bestätigt ist
+    if (!user.emailConfirmed) {
+        throw new Error("Email not confirmed. Please confirm your email before logging in.");
+    }
+
     // Passwortvalidierung
     const isCorrectPassword = await user.isCorrectPassword(password);
     if (!isCorrectPassword) {
@@ -43,6 +48,7 @@ export async function login(name: string, password: string): Promise<{ id: strin
         token,
     };
 }
+
 
 /**
  * Registriert einen neuen Benutzer.

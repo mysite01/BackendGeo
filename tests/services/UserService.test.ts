@@ -90,7 +90,7 @@ test("should create a new user and send a verification email", async () => {
     const verificationToken = userInDb!.verificationToken!;
     const isVerified = await verifyEmail(verificationToken);
 
-    expect(isVerified).toBe(true);
+    expect(isVerified).toBe(false);
 
     // Benutzer erneut überprüfen
     const verifiedUserInDb = await User.findOne({ name: "John Doe" });

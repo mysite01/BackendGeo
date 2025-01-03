@@ -29,19 +29,18 @@ export async function createUser(userResource: UserResource): Promise<UserResour
 
         const savedUser = await user.save();
 
-        // Test-Account von Ethereal erstellen
-        const testAccount = await nodemailer.createTestAccount();
+        // Zoho SMTP-Transporter einrichten
         const transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false, // Kein SSL
+            host: "smtp.zoho.eu",
+            port: 465, // SSL-Port
+            secure: true, // SSL aktivieren
             auth: {
-                user: testAccount.user,
-                pass: testAccount.pass,
+                user: "geopickpoints@zohomail.eu", // Ersetze durch deine Zoho-E-Mail-Adresse
+                pass: "uZvVv@qN@j6CRn2", // Ersetze durch dein Zoho-Passwort
             },
         });
 
-        // Verifizieren der Verbindung (optional, nur zum Debugging)
+        // Verbindung testen (optional, nur für Debugging)
         transporter.verify((error, success) => {
             if (error) {
                 console.error("Fehler bei der SMTP-Verbindung:", error);
@@ -50,9 +49,10 @@ export async function createUser(userResource: UserResource): Promise<UserResour
             }
         });
 
-        const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
-        const mailResponse = await transporter.sendMail({
-            from: testAccount.user, // Absenderadresse
+        const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+        const verificationUrl = `${clientUrl}/verify-email?token=${verificationToken}`;
+            const mailResponse = await transporter.sendMail({
+            from: "geopickpoints@zohomail.eu", // Absenderadresse
             to: user.email, // Empfängeradresse
             subject: "Bestätige deine E-Mail-Adresse",
             html: `<p>Hallo ${user.name},</p>
@@ -62,7 +62,6 @@ export async function createUser(userResource: UserResource): Promise<UserResour
         });
 
         console.log("E-Mail gesendet:", mailResponse.messageId);
-        console.log("Vorschau-URL:", nodemailer.getTestMessageUrl(mailResponse));
 
         return {
             id: savedUser._id.toString(),
