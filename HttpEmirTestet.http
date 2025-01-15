@@ -4,7 +4,8 @@ Content-Type: application/json
 
 {
   "name": "Emir",
-  "password": "securePassword123"
+  "password": "Password123",
+  "email": "EmirKaya19@outlook.de"
 }
 
 ###
@@ -13,17 +14,14 @@ Content-Type: application/json
 
 {
   "name": "Emir",
-  "password": "securePassword123"
+  "password": "Password123"
 }
 
 ###
-POST http://localhost:3443/api/login
+POST http://localhost:3443/api/user/verify-email
 Content-Type: application/json
 
 {
-  "name": "JohnDoe",
-  "password": "securePassword13"
+  "token": "82e400663b702b4cb0384abe5ca90e54f2a0977a41e4b62be0995f166910e4c2"
 }
 
-###
-DELETE http://localhost:3443/api/login
