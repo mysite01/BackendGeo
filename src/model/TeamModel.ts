@@ -6,6 +6,7 @@ export interface ITeam extends Document {
     qaCode:string;
     shareUrl:string;
     poiId:Types.ObjectId[];
+    poiPoints: Number[];
     players: Types.ObjectId[]; // must del
 }
 
@@ -15,6 +16,7 @@ const teamSchema = new Schema<ITeam>({
     qaCode: { type: String, required: true },
     shareUrl: { type: String, required: true },
     poiId: [{ type: Schema.Types.ObjectId, ref: 'PositionClaimed' }],
+    poiPoints: [{type: Number}],
     players: [{ type: Schema.Types.ObjectId, ref: 'Player' }], // must del
 });
 

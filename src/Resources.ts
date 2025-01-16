@@ -40,6 +40,7 @@ export type TeamResource = {
     shareUrl:string;
     createdAt?: string;
     poiId: string[];
+    poiPoints: Number[];
     playersID: string[]; // must del
 };
 export type UserResource = {

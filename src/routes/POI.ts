@@ -1,6 +1,6 @@
 import express from "express";
 import { createPOI, deletePOI, getAllPOIs, getPOIById } from "../services/POIService";
-import { getTeamByPlayerId, updateTeamPOIs } from "../services/TeamService";
+import { getTeamByPlayerId, updateTeamPOIs, getTeam } from "../services/TeamService";
 
 export const poiRouter = express.Router();
 
@@ -72,19 +72,36 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
     const maxPOIClaimDistance = 50; //meter
 
     let id = ""
-    let teams
+    let teamIds
     let player
     let positionPlayer
     if (req.params) {
         id = req.params.id;
     }
     if(req.body) {
-        teams = req.body.teamIds;
+        teamIds = req.body.teamIds;
         player = req.body.playerId;
         positionPlayer = req.body.positionPlayer;
     }
 
     try {
+
+        let teams = Array(teamIds.length).fill(null); 
+        let index = 0;
+        
+        for (const teamId of teamIds) {
+            teams[index] = await getTeam(teamId);
+            index++;
+        }
+        
+        let poiCount = 0
+        for(const team of teams){
+            if (team.poiId.includes(id)) {
+                poiCount++;
+            }
+        }
+
+
         const poi = await getPOIById(id);
         //console.log(`POI Latitude: ${poi.lat}, Player Latitude: ${positionPlayer.lat}, POI Longitude: ${poi.long}, Player Longitude: ${positionPlayer.lng}`);
         const distance = calculateDistance(poi.lat, poi.long, positionPlayer.lat, positionPlayer.lng)
@@ -95,6 +112,7 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
         if (!team.poiId.includes(id) && teamId) {
             if(distance < maxPOIClaimDistance){
                 team.poiId = [...new Set([...team.poiId, id])];
+                team.poiPoints.push(poiCount + 1);
                 await updateTeamPOIs(teamId, { poiId: team.poiId }); 
                 res.status(200).json({ message: "POI claimed successfully", team });
             } else {
