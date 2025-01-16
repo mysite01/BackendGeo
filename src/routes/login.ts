@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { verifyPasswordAndCreateJWT, verifyJWT } from "../services/JWTService";
 import { login } from "../services/AuthenticationService";
 import { optionalAuthentication } from "./Authentication";
+import { User } from "src/model/UserModel";
 
 export const loginRouter = express.Router();
 
@@ -19,50 +20,53 @@ const TTL = parseInt(process.env.JWT_TTL || "3600", 10); // Standard: 1 Stunde
  * Route zum Einloggen eines Benutzers.
  */
 loginRouter.post(
-    "/",
-    body("name").isString().isLength({ max: 100 }),
-    body("password").isString().isLength({ min: 3, max: 100 }),
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  "/",
+  body("name").isString().isLength({ max: 100 }),
+  body("password").isString().isLength({ min: 3, max: 100 }),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        // Validierung der Eingabe
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-          res.status(400).json({ errors: errors.array() });
-          return; 
-        }
-  
-        const { name, password } = matchedData(req) as { name: string; password: string };
-        const loginResult = await login(name, password);
-  
-        if (!loginResult) {
-          res.status(401).json({ message: "Login fehlgeschlagen" });
-          return; // Funktion beenden
-        }
-  
-        // JWT erstellen
-        const jwtString = await verifyPasswordAndCreateJWT(name, password);
-        if (!jwtString) {
-          throw new Error("Fehler beim Erstellen des JWT");
-        }
-  
-        // JWT im Cookie speichern
-        res.cookie(COOKIE_NAME, jwtString, {
-          httpOnly: true,
-          expires: new Date(Date.now() + TTL * 1000), // Ablaufzeit des Cookies
-          secure: true, // Nur für HTTPS
-          sameSite: "none",
-        });
-  
-        // Benutzerinformationen zurückgeben
-        res.status(201).json({
-          id: loginResult.id,
-          exp: Math.floor(Date.now() / 1000) + TTL, // Ablaufzeit als Unix-Timestamp
-        });
+          // Validierung der Eingabe
+          const errors = validationResult(req);
+          if (!errors.isEmpty()) {
+              res.status(400).json({ errors: errors.array() });
+              return; 
+          }
+
+          const { name, password } = matchedData(req) as { name: string; password: string };
+
+          try {
+              // Login-Service verwenden
+              const { id, token } = await login(name, password);
+
+              // JWT im Cookie speichern
+              res.cookie(COOKIE_NAME, token, {
+                  httpOnly: true,
+                  expires: new Date(Date.now() + TTL * 1000), // Ablaufzeit des Cookies
+                  secure: true, // Nur für HTTPS
+                  sameSite: "none",
+              });
+
+              // Benutzerinformationen zurückgeben
+              res.status(200).json({
+                  id,
+                  exp: Math.floor(Date.now() / 1000) + TTL, // Ablaufzeit als Unix-Timestamp
+              });
+          } catch (err: any) {
+              if (err.message === "Email not confirmed. Please confirm your email before logging in.") {
+                  res.status(403).json({ message: err.message });
+              } else if (err.message === "User not found" || err.message === "Invalid password") {
+                  res.status(401).json({ message: "Login fehlgeschlagen" });
+              } else {
+                  throw err; // Weitergeben, falls ein anderer Fehler auftritt
+              }
+          }
       } catch (err) {
-        next(err); // Fehler weitergeben
+          next(err); // Fehler weitergeben
       }
-    }
-  );
+  }
+);
+
+
   
 
 /**
