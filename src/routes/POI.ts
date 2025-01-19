@@ -1,5 +1,5 @@
 import express from "express";
-import { createPOI, deletePOI, getAllPOIs, getPOIById } from "../services/POIService";
+import { createPOI, deletePOI, getAllPOIs, getPOIById, getPOIByIdandTeam } from "../services/POIService";
 import { getTeamByPlayerId, updateTeamPOIs, getTeam, updateTeamPoiPoints } from "../services/TeamService";
 
 export const poiRouter = express.Router();
@@ -46,6 +46,26 @@ poiRouter.get("/:id", async (req, res, next) => {
 
     try {
         const poi = await getPOIById(id);
+        res.status(200).send(poi);
+    } catch (err) {
+        res.status(404); 
+        next(err);
+    }
+});
+
+/**
+ * Route für das Abrufen eines POI anhand der ID und zugehörigem team
+ */
+poiRouter.get("/:teamId/:id", async (req, res, next) => {
+    let id = "";
+    let teamId = "";
+    if (req.params) {
+        id = req.params.id;
+        teamId = req.params.teamId;
+    }
+
+    try {
+        const poi = await getPOIByIdandTeam(id, teamId);
         res.status(200).send(poi);
     } catch (err) {
         res.status(404); 
