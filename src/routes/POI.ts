@@ -46,7 +46,7 @@ poiRouter.get("/:id", async (req, res, next) => {
 
     try {
         const poi = await getPOIById(id);
-        res.status(200).send(poi); 
+        res.status(200).send(poi);
     } catch (err) {
         res.status(404); 
         next(err);

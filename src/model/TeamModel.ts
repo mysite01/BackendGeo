@@ -6,7 +6,7 @@ export interface ITeam extends Document {
     qaCode:string;
     shareUrl:string;
     poiId:Types.ObjectId[];
-    poiPoints: Number[];
+    poiPoints: number[];
     players: Types.ObjectId[]; // must del
 }
 
