@@ -1,10 +1,8 @@
 import { POI } from "../model/POIModel";
 import { POIResource } from "../Resources";
-import { Team } from "src/model/TeamModel";
-import { TeamResource } from "../Resources";
-import mongoose from "mongoose";
+import { Team } from "../model/TeamModel";
 
-/**
+/*
  * Erstellt einen neuen POI
  */
 export async function createPOI(poiData: POIResource): Promise<POIResource> {
