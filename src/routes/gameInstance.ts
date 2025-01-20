@@ -22,7 +22,7 @@ gameInstanceRouter.post("/", async (req, res, next) => {
  */
 gameInstanceRouter.get("/:id", async (req, res, next) => {
     try {
-        const gameInstanceId = req.params.id;
+        const gameInstanceId = req.params.id; 
         const gameInstance = await getGameInstanceById(gameInstanceId);
         res.status(200).json(gameInstance);
     } catch (error) {

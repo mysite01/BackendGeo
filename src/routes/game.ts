@@ -75,12 +75,11 @@ gameRouter.get("/", async (req, res, next) => {
  * Route zum Abrufen aller POIs eines Spiels anhand der GameId
  */
 gameRouter.get("/pois/:id", async (req, res, next) => {
-    const { id } = req.params;
+    const { id } = req.params; 
 
     try {
-        const game = await GameService.getGameById(id);
+        let game = await GameService.getGame(); //Beispielgame (später anpassen)
         const poilist = game.poilId;
-        console.log(poilist)
         if (!game) {
             res.status(404).json({ message: "Spiel nicht gefunden" });
             return;
