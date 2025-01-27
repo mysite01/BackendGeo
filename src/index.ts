@@ -148,6 +148,10 @@ async function setup() {
               broadcast({
                 type: "gameOver"
               })
+            } else if (data.type === "PoiClaimed"){
+              broadcast({
+                type: "PoiClaimed"
+              })
             }
           } catch (error) {
             console.error("Fehler beim Verarbeiten der Nachricht:", error);

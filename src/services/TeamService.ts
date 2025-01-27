@@ -152,17 +152,10 @@ export async function updateTeamPoiPoints(
             throw new Error("Team nicht gefunden");
         }
 
-        // Ensure the `poiPoints` arrays are valid
-        const currentPoiPoints = team.poiPoints; // Existing array of numbers
-        const updatedPoiPointsArray = updatedPoiPoints.poiPoints; // Incoming array of numbers
+        const updatedPoiPointsArray = updatedPoiPoints.poiPoints; 
 
-        // Merge and deduplicate POI points
-        const uniquePoiPoints = Array.from(new Set([...currentPoiPoints, ...updatedPoiPointsArray]));
+        team.poiPoints = updatedPoiPointsArray;
 
-        // Assign the merged list back to `team.poiPoints`
-        team.poiPoints = uniquePoiPoints;
-
-        // Save the updated team document
         const updatedTeam = await team.save();
 
         return updatedTeam;
