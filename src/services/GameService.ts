@@ -71,7 +71,6 @@ export async function getGameById(gameId: string): Promise<GameResource> {
 export async function getGame(): Promise<GameResource> {
     try {
         const game = await Game.findOne().exec();
-        
         if (!game) {
             throw new Error("Spiel nicht gefunden"); // Diese Fehlermeldung wird erwartet
         }

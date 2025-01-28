@@ -89,7 +89,7 @@ poiRouter.get("/", async (req, res, next) => {
 
 poiRouter.post("/claim/:id", async (req, res, next) => {
 
-    const maxPOIClaimDistance = 5000; //meter
+    const maxPOIClaimDistance = 200; //meter
 
     let id = ""
     let teamIds
@@ -121,7 +121,6 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
             }
         }
 
-        console.log("poiCount")
         const poi = await getPOIById(id);
         //console.log(`POI Latitude: ${poi.lat}, Player Latitude: ${positionPlayer.lat}, POI Longitude: ${poi.long}, Player Longitude: ${positionPlayer.lng}`);
         const distance = calculateDistance(poi.lat, poi.long, positionPlayer.lat, positionPlayer.lng)
@@ -134,7 +133,7 @@ poiRouter.post("/claim/:id", async (req, res, next) => {
                 team.poiPoints.push(poiCount)
                 await updateTeamPOIs(teamId, { poiId: team.poiId }); 
                 await updateTeamPoiPoints(teamId, {poiPoints: team.poiPoints})
-                console.log("poiPoints: " + team.poiPoints)
+                //console.log("poiPoints: " + team.poiPoints)
                 res.status(200).json({ message: "POI claimed successfully", team });
             } else {
                 res.status(300).json({message: `Too far away. Current Distance: ${Math.round(distance)} meters`})

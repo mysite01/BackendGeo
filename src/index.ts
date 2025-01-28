@@ -13,6 +13,61 @@ import { WebSocketServer, WebSocket } from 'ws';
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import express from 'express';
+import cors from 'cors';
+
+
+
+
+const corsOptions = {
+  origin: 'https://geopick-front-new.vercel.app', // Ersetze dies mit deiner tatsächlichen Frontend-Domain
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type, Authorization', // Erlaubte Header
+  credentials: true, // Falls du Cookies oder Authentifizierung benötigst
+};
+
+
+
+
+app.use(cors(corsOptions));
+
+
+// Reagiere auf Preflight-Anfragen (OPTIONEN-Methoden)
+app.options('*', cors(corsOptions));
+
+
+app.post('*', (req, res, next) => {
+  console.log(`POST request from: ${req.get('Origin') || req.ip}`);
+  next(); // Weiter mit der nächsten Middleware oder Route
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async function createExampleGame() {
     const berlinPoi1: POIResource = { name: "Alexanderplatz", lat: 52.520008, long: 13.404954, beschreibung: "Ein belebter Platz mit Fernsehturm, Geschäften und urbanem Flair.", punkte: 100}
     const berlinPoi2: POIResource = { name: "Brandenburger Tor", lat: 52.516275, long: 13.377704, beschreibung: "Ein ikonisches Monument und Symbol für Geschichte und Einheit.", punkte: 200}
@@ -109,17 +164,17 @@ async function setup() {
     const wss = new WebSocketServer({ server: httpServer });
 
     wss.on("connection", (ws: WebSocket) => {
-        console.info("Ein neuer Client hat sich verbunden.");
+        //console.info("Ein neuer Client hat sich verbunden.");
         clients.add(ws);
       
         ws.on("message", (message) => {
           try {
-            console.info(`Nachricht empfangen: ${message}`);
+            //console.info(`Nachricht empfangen: ${message}`);
             const data = JSON.parse(message.toString());
-            console.info("Parsed message:", data); // Debugging-Ausgabe
+            //console.info("Parsed message:", data); // Debugging-Ausgabe
       
             if (data.type === "join") {
-              console.info(`${data.playerName} ist Team ${data.teamId} beigetreten.`);
+              //console.info(`${data.playerName} ist Team ${data.teamId} beigetreten.`);
               broadcast({
                 type: "join",
                 playerId: data.playerId,
@@ -127,7 +182,7 @@ async function setup() {
                 teamId: data.teamId,
               });
             } else if (data.type === "leave") {
-              console.info(`${data.playerName} hat Team ${data.teamId} verlassen.`);
+              //console.info(`${data.playerName} hat Team ${data.teamId} verlassen.`);
               broadcast({
                 type: "leave",
                 playerId: data.playerId,
@@ -159,7 +214,7 @@ async function setup() {
         });
       
         ws.on("close", () => {
-          console.info("Ein Client hat die Verbindung geschlossen.");
+          //console.info("Ein Client hat die Verbindung geschlossen.");
           clients.delete(ws);
         });
       });
